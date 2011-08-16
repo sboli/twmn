@@ -1,3 +1,35 @@
 Twmn is a notification system which is adapted to work with tiling window managers.
 The notifications are shown as a single line which is the usual size of the top/bottom bar,
 so no popup, just a notification slide.
+
+
+# twmnc
+    The command line client program. Sends notification requests to twmnd.
+    See twmnc --help for more infos.
+
+# twmnd
+    The daemon program. Listen no notification requests and show them one after another.
+    This uses a config file which is usually located at /home/$USER/.config/twmn/twmn.conf
+    and contains the following : 
+    [General]
+    critical_icon=/full/path/icons/cross-shield.png
+    duration=3000
+    info_icon=
+    port=9797
+    position=top_right
+    warning_icon=
+    height=18
+
+    # Description:
+    *_icon   : An icon. You can add as many as you want.
+    duration : How long each notification remains visible.
+    port     : The UDP port to use for notifications, 9797 is the default.
+    position : The position of the notifications. Available values are :
+		- top_right
+		- top_left
+		- bottom_right
+		- bottom_left
+    height   : The height of the notification slide, useful to match the height of
+	    your tiling window manager bar.
+
+
