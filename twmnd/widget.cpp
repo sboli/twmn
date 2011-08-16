@@ -111,6 +111,9 @@ void Widget::processMessageQueue()
     qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setStartValue(0);
     qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEndValue(width);
     m_animation.start();
+    QString soundCommand = m_settings.get("sound_command").toString();
+    if (!soundCommand.isEmpty())
+        QProcess::startDetached(soundCommand);
 }
 
 void Widget::updateTopLeftAnimation(QVariant value)

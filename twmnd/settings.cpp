@@ -9,6 +9,7 @@ Settings::Settings()
     m_defaultSettings["info_icon"] = "";
     m_defaultSettings["duration"] = "3000";
     m_defaultSettings["height"] = 18;
+    m_defaultSettings["sound_command"] = "";
     reload();
 }
 

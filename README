@@ -19,6 +19,7 @@ so no popup, just a notification slide.
     position=top_right
     warning_icon=
     height=18
+    sound_command=
 
     # Description:
     *_icon   : An icon. You can add as many as you want.
@@ -31,5 +32,6 @@ so no popup, just a notification slide.
 		- bottom_left
     height   : The height of the notification slide, useful to match the height of
 	    your tiling window manager bar.
+    sound_command : A command to play a sound with your favourite player. Leave it empty for no sound.
 
 
