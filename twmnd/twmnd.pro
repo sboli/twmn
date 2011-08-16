@@ -9,7 +9,7 @@ QT       += core gui network
 TARGET = twmnd
 TEMPLATE = app
 CONFIG += release
-
+DESTDIR = ../bin/
 
 SOURCES += main.cpp\
         widget.cpp \
