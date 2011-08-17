@@ -10,28 +10,27 @@ so no popup, just a notification slide.
 # twmnd
     The daemon program. Listen no notification requests and show them one after another.
     This uses a config file which is usually located at /home/$USER/.config/twmn/twmn.conf
-    and contains the following : 
-    [General]
-    critical_icon=/full/path/icons/cross-shield.png
-    duration=3000
-    info_icon=
-    port=9797
-    position=top_right
-    warning_icon=
-    height=18
-    sound_command=
+    and contains the following, INI format. You should give twmnd a first launch so it can create the default configuration file.: 
 
-    # Description:
-    *_icon   : An icon. You can add as many as you want.
-    duration : How long each notification remains visible.
-    port     : The UDP port to use for notifications, 9797 is the default.
+    # [gui]
+    background_color : background color, HTML style [#000000 ; #FFFFFF]
+    foreground_color : Same here for the font color.
+    height   : The height of the notification slide, useful to match the height of
+	       your tiling window manager bar.
     position : The position of the notifications. Available values are :
 		- top_right
 		- top_left
 		- bottom_right
 		- bottom_left
-    height   : The height of the notification slide, useful to match the height of
-	    your tiling window manager bar.
+    font : The font family. For example : font=Sans
+    font_size : The font pixel size.
+
+    # [icons]
+    *_icon   : An icon. You can add as many as you want.
+
+    # [main]
+    duration : How long each notification remains visible.
+    port     : The UDP port to use for notifications, 9797 is the default.
     sound_command : A command to play a sound with your favourite player. Leave it empty for no sound.
 
 
