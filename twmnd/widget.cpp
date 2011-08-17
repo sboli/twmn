@@ -107,15 +107,18 @@ void Widget::processMessageQueue()
         return;
     if (m_animation.state() == QAbstractAnimation::Running || (m_animation.totalDuration()-m_animation.currentTime()) < 50)
         return;
+
+    QFont boldFont = font();
+    boldFont.setBold(true);
+    int height = m_settings.get("gui/height").toInt()-2;
     Message m = m_messageQueue.front();
     m_messageQueue.pop_front();
-    m_contentView["icon"]->setPixmap(m.icon.pixmap(25, 25));
-    m_contentView["title"]->setText("<strong>  " + m.title + "</strong>");
+    m_contentView["icon"]->setPixmap(m.icon.pixmap(height, height));
+    m_contentView["title"]->setText("  " + m.title);
+    m_contentView["title"]->setFont(boldFont);
     m_contentView["text"]->setText("  " + m.text + "  ");
-    QFont tmp = m_contentView["title"]->font();
-    tmp.setBold(true);
-    int width = QFontMetrics(m_contentView["text"]->font()).width(m_contentView["text"]->text())
-                + QFontMetrics(tmp).width("  " + m.title)
+    int width = QFontMetrics(font()).width(m_contentView["text"]->text())
+                + QFontMetrics(boldFont).width("  " + m.title)
                 + m_contentView["icon"]->pixmap()->width();
     m_animation.setDirection(QAnimationGroup::Forward);
     qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEasingCurve(QEasingCurve::OutBounce);
