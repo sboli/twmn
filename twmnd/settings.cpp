@@ -7,6 +7,7 @@ Settings::Settings()
     m_defaultSettings["main/duration"] = "3000";
     m_defaultSettings["gui/position"] = "top_right";
     m_defaultSettings["gui/height"] = 18;
+    m_defaultSettings["gui/font_size"] = 18;
     m_defaultSettings["gui/foreground_color"] = "#000055";
     m_defaultSettings["gui/background_color"] = "#000000";
     m_defaultSettings["icons/critical_icon"] = "";

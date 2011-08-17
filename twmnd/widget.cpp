@@ -23,7 +23,9 @@ Widget::Widget()
     if (!fg.isEmpty())
         sheet += QString("color: %1;").arg(fg);
     setStyleSheet(sheet);
-    QApplication::setFont(QFont(m_settings.get("gui/font").toString()));
+    QFont font(m_settings.get("gui/font").toString());
+    font.setPixelSize(m_settings.get("gui/font_size").toInt());
+    QApplication::setFont(font);
     // Let the event loop run
     QTimer::singleShot(30, this, SLOT(init()));
     QPropertyAnimation* anim = new QPropertyAnimation;
