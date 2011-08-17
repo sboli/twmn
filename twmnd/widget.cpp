@@ -13,8 +13,17 @@
 
 Widget::Widget()
 {
-    //setWindowFlags(Qt::SplashScreen);
     setWindowFlags(Qt::ToolTip);
+    setObjectName("Widget");
+    QString bg = m_settings.get("gui/background_color").toString();
+    QString fg = m_settings.get("gui/foreground_color").toString();
+    QString sheet;
+    if (!bg.isEmpty())
+        sheet += QString("background-color: %1;").arg(bg);
+    if (!fg.isEmpty())
+        sheet += QString("color: %1;").arg(fg);
+    setStyleSheet(sheet);
+    QApplication::setFont(QFont(m_settings.get("gui/font").toString()));
     // Let the event loop run
     QTimer::singleShot(30, this, SLOT(init()));
     QPropertyAnimation* anim = new QPropertyAnimation;
@@ -23,19 +32,19 @@ Widget::Widget()
     anim->setEasingCurve(QEasingCurve::OutBounce);
     anim->setDuration(1000);
     connect(anim, SIGNAL(finished()), this, SLOT(reverseTrigger()));
-    if (m_settings.get("position") == "top_left") {
+    if (m_settings.get("gui/position") == "top_left") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopLeftAnimation(QVariant)));
     }
-    else if (m_settings.get("position") == "top_right") {
+    else if (m_settings.get("gui/position") == "top_right") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopRightAnimation(QVariant)));
     }
-    else if (m_settings.get("position") == "bottom_right") {
+    else if (m_settings.get("gui/position") == "bottom_right") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomRightAnimation(QVariant)));
     }
-    else if (m_settings.get("position") == "bottom_left") {
+    else if (m_settings.get("gui/position") == "bottom_left") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomLeftAnimation(QVariant)));
     }
-    setFixedHeight(m_settings.get("height").toInt());
+    setFixedHeight(m_settings.get("gui/height").toInt());
 }
 
 Widget::~Widget()
@@ -45,7 +54,7 @@ Widget::~Widget()
 
 void Widget::init()
 {
-    int port = m_settings.get("port").toInt();
+    int port = m_settings.get("main/port").toInt();
     if (!m_socket.bind(QHostAddress::Any, port)) {
         qCritical() << "Unable to listen port" << port;
         close();
@@ -71,8 +80,8 @@ void Widget::onDataReceived()
     Message m;
     QIcon icon(out[0]);
     if (icon.pixmap(50, 50).isNull()) {
-        if (m_settings.has(out[0]))
-            icon = QIcon(m_settings.get(out[0]).toString());
+        if (m_settings.has("icons/" + out[0]))
+            icon = QIcon(m_settings.get("icons/" + out[0]).toString());
         else {
             QImage img(1, 1, QImage::Format_ARGB32);
             QPainter p;
@@ -111,7 +120,7 @@ void Widget::processMessageQueue()
     qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setStartValue(0);
     qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEndValue(width);
     m_animation.start();
-    QString soundCommand = m_settings.get("sound_command").toString();
+    QString soundCommand = m_settings.get("main/sound_command").toString();
     if (!soundCommand.isEmpty())
         QProcess::startDetached(soundCommand);
 }
@@ -157,7 +166,7 @@ void Widget::reverseTrigger()
         QTimer::singleShot(30, this, SLOT(processMessageQueue()));
         return;
     }
-    QTimer::singleShot(m_settings.get("duration").toInt(), this, SLOT(reverseStart()));
+    QTimer::singleShot(m_settings.get("main/duration").toInt(), this, SLOT(reverseStart()));
 }
 
 void Widget::reverseStart()

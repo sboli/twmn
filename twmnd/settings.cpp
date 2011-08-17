@@ -2,14 +2,16 @@
 
 Settings::Settings()
 {
-    m_defaultSettings["position"] = "top_right";
-    m_defaultSettings["port"] = 9797;
-    m_defaultSettings["critical_icon"] = "";
-    m_defaultSettings["warning_icon"] = "";
-    m_defaultSettings["info_icon"] = "";
-    m_defaultSettings["duration"] = "3000";
-    m_defaultSettings["height"] = 18;
-    m_defaultSettings["sound_command"] = "";
+    m_defaultSettings["main/port"] = 9797;
+    m_defaultSettings["main/sound_command"] = "";
+    m_defaultSettings["main/duration"] = "3000";
+    m_defaultSettings["gui/position"] = "top_right";
+    m_defaultSettings["gui/height"] = 18;
+    m_defaultSettings["gui/foreground_color"] = "#000055";
+    m_defaultSettings["gui/background_color"] = "#000000";
+    m_defaultSettings["icons/critical_icon"] = "";
+    m_defaultSettings["icons/warning_icon"] = "";
+    m_defaultSettings["icons/info_icon"] = "";
     reload();
 }
 
@@ -24,8 +26,9 @@ void Settings::reload()
     settings.setIniCodec("UTF-8");
     QStringList keys = settings.allKeys();
     m_data.clear();
-    foreach (QString i, keys)
+    foreach (QString i, keys) {
         m_data[i] = settings.value(i);
+    }
     save();
 }
 
