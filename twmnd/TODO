@@ -1,2 +1,3 @@
 - Choose every settings from the client
 - Layout mode, from a specific configuration file
+- Match twmnc with notify-send so an alias can make it
