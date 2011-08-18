@@ -31,7 +31,6 @@ void Settings::reload()
         m_data[i] = settings.value(i);
     }
     save();
-    qDebug() << m_file;
 }
 
 void Settings::set(QString setting, const QVariant &value)

@@ -2,6 +2,7 @@
 #include <exception>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#include <boost/shared_ptr.hpp>
 #include <QApplication>
 #include <QFileInfo>
 #include <QDir>
@@ -50,12 +51,16 @@ Widget::Widget()
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomLeftAnimation(QVariant)));
     }
     setFixedHeight(m_settings.get("gui/height").toInt());
+
+    /* DEBUG
+    Settings s("urgent");
+    qDebug() << s.get("main/duration").toInt();
+    //*/
 }
 
 Widget::~Widget()
 {
 }
-
 
 void Widget::init()
 {
@@ -78,7 +83,6 @@ void Widget::init()
 
 void Widget::onDataReceived()
 {
-
     boost::property_tree::ptree tree;
     Message m;
     try {
@@ -90,7 +94,7 @@ void Widget::onDataReceived()
         boost::property_tree::ptree& root = tree.get_child("root");
         boost::property_tree::ptree::iterator it;
         for (it = root.begin(); it != root.end(); ++it) {
-            std::cout << it->first << " - " << it->second.get_value<std::string>() << std::endl;
+            //std::cout << it->first << " - " << it->second.get_value<std::string>() << std::endl;
             m.data[QString::fromStdString(it->first)] = boost::optional<QVariant>(it->second.get_value<std::string>().c_str());
         }
     }
@@ -98,21 +102,7 @@ void Widget::onDataReceived()
         std::cout << "ERROR : " << e.what() << std::endl;
     }
     if (m.data["icon"]) {
-        QPixmap icon(m.data["icon"]->toString());
-        // mettre à jour les settings en accord avec un fichier de configuration.
-        if (icon.isNull()) {
-            if (m_settings.has("icons/" + m.data["icon"]->toString()))
-                icon = QPixmap(m_settings.get("icons/" + m.data["icon"]->toString()).toString());
-            else {
-                QImage img(1, 1, QImage::Format_ARGB32);
-                QPainter p;
-                p.begin(&img);
-                p.fillRect(0, 0, 1, 1, QBrush(QColor::fromRgb(255, 255, 255, 0)));
-                p.end();
-                icon = QPixmap::fromImage(img);
-            }
-        }
-        m.data["icon"].reset(icon);
+        m.data["icon"].reset(loadPixmap(m.data["icon"]->toString()));
     }
     m_messageQueue.push_back(m);
     // get out of here
@@ -129,6 +119,7 @@ void Widget::processMessageQueue()
     boldFont.setBold(true);
     int height = m_settings.get("gui/height").toInt()-2;
     Message m = m_messageQueue.front();
+    loadDefaults();
     setupIcon();
     setupTitle();
     setupContent();
@@ -202,8 +193,8 @@ int Widget::computeWidth()
     QFont boldFont = font();
     boldFont.setBold(true);
     int width = 0;
-    width += QFontMetrics(font()).width(m_contentView["title"]->text())
-            + QFontMetrics(boldFont).width(m_contentView["text"]->text());
+    width += QFontMetrics(boldFont).width(m_contentView["title"]->text())
+            + QFontMetrics(font()).width(m_contentView["text"]->text());
     if (m.data["icon"])
         width += m_contentView["icon"]->pixmap()->width();
     return width;
@@ -212,11 +203,15 @@ int Widget::computeWidth()
 void Widget::setupIcon()
 {
     Message& m = m_messageQueue.front();
-    if (m.data["icon"])
+    if (m.data["icon"]) {
         //TODO: use height, if bigger then scale down
         m_contentView["icon"]->setPixmap(qvariant_cast<QPixmap>(*m.data["icon"]).copy(0, 0, 15, 15));
-    else
+        m_contentView["icon"]->setMaximumWidth(9999);
+    }
+    else {
         m_contentView["icon"]->setPixmap(QPixmap());
+        m_contentView["icon"]->setFixedWidth(2);
+    }
 }
 
 void Widget::setupTitle()
@@ -224,19 +219,81 @@ void Widget::setupTitle()
     QFont boldFont = font();
     boldFont.setBold(true);
     Message& m = m_messageQueue.front();
-    if (m.data["title"]) {
+    if (m.data["title"]) {              // avoid ugly space if no icon is set
         m_contentView["title"]->setText((m.data["icon"] ? " " : "") + m.data["title"]->toString());
         m_contentView["title"]->setFont(boldFont);
+        m_contentView["title"]->setMaximumWidth(9999);
     }
-    else
+    else {
         m_contentView["title"]->setText("");
+        m_contentView["title"]->setFixedWidth(0);
+    }
 }
 
 void Widget::setupContent()
 {
     Message& m = m_messageQueue.front();
-    if (m.data["content"])
-        m_contentView["text"]->setText(" " + m.data["content"]->toString() + " ");
-    else
+    if (m.data["content"]) {
+        m_contentView["text"]->setText((m.data["icon"] || m.data["title"] ? " " : "") + m.data["content"]->toString() + " ");
+        m_contentView["text"]->setMaximumWidth(9999);
+    }
+    else {
         m_contentView["text"]->setText("");
+        m_contentView["text"]->setFixedWidth(0);
+    }
 }
+
+void Widget::loadDefaults()
+{
+    // "content" << "icon" << "title" << "layout" << "size" << "pos" << "fn" << "fs" << "duration" < "sc" << "bg" << "fg";
+    Message& m = m_messageQueue.front();
+    Settings* s = &m_settings;
+    if (m.data["layout"]) {
+        QString name = m.data["layout"]->toString();
+        name.remove(".conf");
+        s = new Settings(name);
+        s->fillWith(m_settings);
+        qDebug() << "Layout loaded : " << name;
+        qDebug() << s->get("gui/foreground_color");
+    }
+    if (!m.data["bg"])
+        m.data["bg"] = boost::optional<QVariant>(s->get("gui/background_color"));
+    if (!m.data["fg"])
+        m.data["fg"] = boost::optional<QVariant>(s->get("gui/foreground_color"));
+    if (!m.data["sc"])
+        m.data["sc"] = boost::optional<QVariant>(s->get("main/sound_command"));
+    if (!m.data["duration"])
+        m.data["duration"] = boost::optional<QVariant>(s->get("main/duration"));
+    if (!m.data["fs"])
+        m.data["fs"] = boost::optional<QVariant>(s->get("gui/font_size"));
+    if (!m.data["fn"])
+        m.data["fn"] = boost::optional<QVariant>(s->get("gui/font"));
+    if (!m.data["pos"])
+        m.data["pos"] = boost::optional<QVariant>(s->get("gui/position"));
+    if (!m.data["size"])
+        m.data["size"] = boost::optional<QVariant>(s->get("gui/height"));
+    if (!m.data["icon"])
+        m.data["icon"] = loadPixmap(s->has("gui/icon") ? s->get("gui/icon").toString() : "");
+    if (s != &m_settings)
+        delete s;
+}
+
+QPixmap Widget::loadPixmap(QString pattern)
+{
+    QPixmap icon(pattern);
+    if (icon.isNull()) {
+        if (m_settings.has("icons/" + pattern))
+            icon = QPixmap(m_settings.get("icons/" + pattern).toString());
+        else {
+            QImage img(1, 1, QImage::Format_ARGB32);
+            QPainter p;
+            p.begin(&img);
+            p.fillRect(0, 0, 1, 1, QBrush(QColor::fromRgb(255, 255, 255, 0)));
+            p.end();
+            icon = QPixmap::fromImage(img);
+        }
+    }
+    return icon;
+}
+
+
