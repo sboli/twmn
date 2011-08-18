@@ -50,7 +50,7 @@ int main(int argc, char** argv)
             if (vm.count("content"))        root.add("content", vm["content"].as<std::string>());
             if (vm.count("icon"))           root.add("icon", vm["icon"].as<std::string>());
             if (vm.count("title"))          root.add("title", vm["title"].as<std::string>());
-            if (vm.count("layout"))         root.add("layout", vm["content"].as<std::string>());
+            if (vm.count("layout"))         root.add("layout", vm["layout"].as<std::string>());
             if (vm.count("size"))           root.add("size", vm["size"].as<int>());
             if (vm.count("pos"))            root.add("pos", vm["pos"].as<std::string>());
             if (vm.count("fn"))             root.add("fn", vm["fn"].as<std::string>());
@@ -61,6 +61,7 @@ int main(int argc, char** argv)
             if (vm.count("fg"))             root.add("fg", vm["fg"].as<std::string>());
             boost::property_tree::xml_parser::write_xml(out, tree);
         }
+        std::cout << out.str() << std::endl;
         io_service ios;
         ip::udp::socket s(ios, ip::udp::endpoint(ip::udp::v4(), 0));
         s.send_to(buffer(out.str()), ip::udp::endpoint(ip::address(ip::address_v4::from_string(vm["host"].as<std::string>())), vm["port"].as<int>()));
