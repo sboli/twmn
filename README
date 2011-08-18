@@ -7,6 +7,10 @@ so no popup, just a notification slide.
     The command line client program. Sends notification requests to twmnd.
     See twmnc --help for more infos.
 
+    --layout : This specifies a layout name. A specific configuration file next to twmn.conf which is
+		used for this layout. The layout take precedence over the twmn.conf and
+		twmnc parameters take precedence over the layout.
+
 # twmnd
     The daemon program. Listen no notification requests and show them one after another.
     This uses a config file which is usually located at /home/$USER/.config/twmn/twmn.conf
@@ -25,7 +29,7 @@ so no popup, just a notification slide.
 		- bottom_left
     font : The font family. For example : font=Sans
     font_size : The font pixel size.
-    icon : An icon for the layout. Optional.
+    icon : An icon for the layout. Optional. Useful only for a layout file.
 
     # [icons]
     *_icon   : An icon. You can add as many as you want.
