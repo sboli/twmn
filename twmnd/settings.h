@@ -2,6 +2,7 @@
 #define SETTINGS_H
 
 #include <QSettings>
+#include <QApplication>
 #include <QtCore>
 
 /*!
@@ -10,7 +11,7 @@
 class Settings
 {
 public:
-    Settings();
+    Settings(QString file = QApplication::applicationName());
 
     /*!
       * \brief Sauvegarde les réglages
@@ -20,12 +21,12 @@ public:
     /*!
       * \brief Recharge les paramètres à partir du fichier.
       */
-    void		    reload();
+    void                reload();
 
     /*!
       * \brief Enregistre le paramètre setting
       */
-    void		    set(QString setting, const QVariant& value);
+    void                set(QString setting, const QVariant& value);
 
     /*!
       * \brief Récupère le paramètre setting
@@ -45,6 +46,7 @@ public:
 private:
     QMap<QString, QVariant> m_data;
     QMap<QString, QVariant> m_defaultSettings;
+    QString                 m_file;
 };
 
 #endif // SETTINGS_H

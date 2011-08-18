@@ -1,6 +1,6 @@
 #include "settings.h"
 
-Settings::Settings()
+Settings::Settings(QString file) : m_file(file)
 {
     m_defaultSettings["main/port"] = 9797;
     m_defaultSettings["main/sound_command"] = "";
@@ -23,7 +23,7 @@ Settings::~Settings()
 
 void Settings::reload()
 {
-    QSettings settings(QSettings::NativeFormat, QSettings::UserScope, "twmn", "twmn");
+    QSettings settings(QSettings::NativeFormat, QSettings::UserScope, "twmn", m_file);
     settings.setIniCodec("UTF-8");
     QStringList keys = settings.allKeys();
     m_data.clear();
@@ -31,6 +31,7 @@ void Settings::reload()
         m_data[i] = settings.value(i);
     }
     save();
+    qDebug() << m_file;
 }
 
 void Settings::set(QString setting, const QVariant &value)
@@ -57,7 +58,7 @@ bool Settings::has(QString setting)
 
 void Settings::save()
 {
-    QSettings settings(QSettings::NativeFormat, QSettings::UserScope, "twmn", "twmn");
+    QSettings settings(QSettings::NativeFormat, QSettings::UserScope, "twmn", m_file);
     settings.setIniCodec("UTF-8");
     settings.clear();
     for (QMap<QString, QVariant>::const_iterator it = m_data.begin(); it != m_data.end(); ++it) {
