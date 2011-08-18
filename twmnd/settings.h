@@ -43,6 +43,11 @@ public:
       */
     void		    save();
 
+    /*!
+      * \brief Complète cette instance avec les donnés de s, sans écraser les données de cette instance.
+      */
+    void            fillWith(const Settings& s);
+
 private:
     QMap<QString, QVariant> m_data;
     QMap<QString, QVariant> m_defaultSettings;

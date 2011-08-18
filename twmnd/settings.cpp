@@ -68,3 +68,13 @@ void Settings::save()
         settings.setValue(it.key(), it.value());
     }
 }
+
+void Settings::fillWith(const Settings &s)
+{
+    for (QMap<QString, QVariant>::const_iterator it = s.m_data.begin(); it != s.m_data.end(); ++it) {
+        if (m_data.contains(it.key()))
+            continue;
+        else
+            m_data[it.key()] = it.value();
+    }
+}
