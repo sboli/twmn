@@ -18,18 +18,6 @@
 Widget::Widget()
 {
     setWindowFlags(Qt::ToolTip);
-    setObjectName("Widget");
-    QString bg = m_settings.get("gui/background_color").toString();
-    QString fg = m_settings.get("gui/foreground_color").toString();
-    QString sheet;
-    if (!bg.isEmpty())
-        sheet += QString("background-color: %1;").arg(bg);
-    if (!fg.isEmpty())
-        sheet += QString("color: %1;").arg(fg);
-    setStyleSheet(sheet);
-    QFont font(m_settings.get("gui/font").toString());
-    font.setPixelSize(m_settings.get("gui/font_size").toInt());
-    QApplication::setFont(font);
     // Let the event loop run
     QTimer::singleShot(30, this, SLOT(init()));
     QPropertyAnimation* anim = new QPropertyAnimation;
@@ -120,6 +108,8 @@ void Widget::processMessageQueue()
     int height = m_settings.get("gui/height").toInt()-2;
     Message m = m_messageQueue.front();
     loadDefaults();
+    setupFont();
+    setupColors();
     setupIcon();
     setupTitle();
     setupContent();
@@ -198,6 +188,27 @@ int Widget::computeWidth()
     if (m.data["icon"])
         width += m_contentView["icon"]->pixmap()->width();
     return width;
+}
+
+void Widget::setupFont()
+{
+    Message& m = m_messageQueue.front();
+    QFont font(m.data["fn"]->toString());
+    font.setPixelSize(m.data["fs"]->toInt());
+    QApplication::setFont(font);
+}
+
+void Widget::setupColors()
+{
+    Message& m = m_messageQueue.front();
+    QString bg = m.data["bg"]->toString();
+    QString fg = m.data["fg"]->toString();
+    QString sheet;
+    if (!bg.isEmpty())
+        sheet += QString("background-color: %1;").arg(bg);
+    if (!fg.isEmpty())
+        sheet += QString("color: %1;").arg(fg);
+    setStyleSheet(sheet);
 }
 
 void Widget::setupIcon()

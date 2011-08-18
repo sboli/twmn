@@ -40,6 +40,10 @@ private:
       */
     int                     computeWidth();
 
+    void                    setupFont();
+
+    void                    setupColors();
+
     /*!
       * \brief Set the icon.
       */
