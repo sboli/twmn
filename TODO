@@ -1,3 +1,8 @@
-- Choose every settings from the client
-- Layout mode, from a specific configuration file
 - Match twmnc with notify-send so an alias can make it
+- DBUS support
+- Index de notification pour pouvoir la remplacer par la suite.
+- Possibilité d'afficher plusieurs notifications l'une sous l'autre
+- Pour ceux qui n'utilisent pas trop la souris, un raccourci clavier pour sélectionner la première notification,
+    quelques touches pour naviguer entre les notifications et une touche pour fermer la notif
+- rattacher une commande à éxécuter pour chaque notification si l'utilisateur l'active, ensuite j'améliorai avec la prise de focus.
+- Donner un identifiant à la notification de manière à ce que le script puisse la remplacer/modifier (par exemple passer de « Vous avez 2 mails » à « Vous avez 3 mails » 
