@@ -109,7 +109,7 @@ void Widget::processMessageQueue()
     qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setStartValue(0);
     qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEndValue(width);
     m_animation.start();
-    QString soundCommand = m_settings.get("main/sound_command").toString();
+    QString soundCommand = m.data["sc"]->toString();
     if (!soundCommand.isEmpty())
         QProcess::startDetached(soundCommand);
 }
@@ -155,7 +155,6 @@ void Widget::reverseTrigger()
         QTimer::singleShot(30, this, SLOT(processMessageQueue()));
         return;
     }
-    qDebug() << m_messageQueue.front().data["duration"]->toInt();
     QTimer::singleShot(m_messageQueue.front().data["duration"]->toInt(), this, SLOT(reverseStart()));
     m_messageQueue.pop_front();
 }
