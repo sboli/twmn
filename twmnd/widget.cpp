@@ -155,8 +155,8 @@ void Widget::reverseTrigger()
         QTimer::singleShot(30, this, SLOT(processMessageQueue()));
         return;
     }
-    QTimer::singleShot(m_settings.get("main/duration").toInt(), this, SLOT(reverseStart()));
-    ///TODO : use time
+    qDebug() << m_messageQueue.front().data["duration"]->toInt();
+    QTimer::singleShot(m_messageQueue.front().data["duration"]->toInt(), this, SLOT(reverseStart()));
     m_messageQueue.pop_front();
 }
 
@@ -203,7 +203,6 @@ void Widget::setupColors()
 
 void Widget::connectForPosition(QString position)
 {
-    qDebug() << position;
     QPropertyAnimation* anim = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0));
     if (!anim)
         return;
