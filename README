@@ -18,7 +18,7 @@ so no popup, just a notification slide.
     it can create the default configuration file.: 
 
     # [gui]
-    background_color : background color, HTML style [#000000 ; #FFFFFF]
+    background_color : background color, HTML style [#000000 ; #FFFFFF] or svg style (blue, red, lightgray, etc ...)
     foreground_color : Same here for the font color.
     height   : The height of the notification slide, useful to match the height of
 	       your tiling window manager bar.
