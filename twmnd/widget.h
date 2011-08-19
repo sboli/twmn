@@ -44,6 +44,8 @@ private:
 
     void                    setupColors();
 
+    void                    connectForPosition(QString position);
+
     /*!
       * \brief Set the icon.
       */

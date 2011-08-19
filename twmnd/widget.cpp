@@ -26,18 +26,7 @@ Widget::Widget()
     anim->setEasingCurve(QEasingCurve::OutBounce);
     anim->setDuration(1000);
     connect(anim, SIGNAL(finished()), this, SLOT(reverseTrigger()));
-    if (m_settings.get("gui/position") == "top_left") {
-        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopLeftAnimation(QVariant)));
-    }
-    else if (m_settings.get("gui/position") == "top_right") {
-        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopRightAnimation(QVariant)));
-    }
-    else if (m_settings.get("gui/position") == "bottom_right") {
-        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomRightAnimation(QVariant)));
-    }
-    else if (m_settings.get("gui/position") == "bottom_left") {
-        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomLeftAnimation(QVariant)));
-    }
+    connectForPosition(m_settings.get("gui/position").toString());
     setFixedHeight(m_settings.get("gui/height").toInt());
 
     /* DEBUG
@@ -105,14 +94,15 @@ void Widget::processMessageQueue()
         return;
     QFont boldFont = font();
     boldFont.setBold(true);
-    int height = m_settings.get("gui/height").toInt()-2;
-    Message m = m_messageQueue.front();
+    Message& m = m_messageQueue.front();
     loadDefaults();
+    setFixedHeight(m.data["size"]->toInt());
     setupFont();
     setupColors();
     setupIcon();
     setupTitle();
     setupContent();
+    connectForPosition(m.data["pos"]->toString());
     m_animation.setDirection(QAnimationGroup::Forward);
     int width = computeWidth();
     qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEasingCurve(QEasingCurve::OutBounce);
@@ -127,7 +117,7 @@ void Widget::processMessageQueue()
 void Widget::updateTopLeftAnimation(QVariant value)
 {
     show();
-    setFixedWidth(value.toInt());
+    setGeometry(0, 0, value.toInt(), height());
     layout()->setSpacing(0);
 }
 
@@ -209,6 +199,30 @@ void Widget::setupColors()
     if (!fg.isEmpty())
         sheet += QString("color: %1;").arg(fg);
     setStyleSheet(sheet);
+}
+
+void Widget::connectForPosition(QString position)
+{
+    qDebug() << position;
+    QPropertyAnimation* anim = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0));
+    if (!anim)
+        return;
+    disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopLeftAnimation(QVariant)));
+    disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopLeftAnimation(QVariant)));
+    disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomRightAnimation(QVariant)));
+    disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomLeftAnimation(QVariant)));
+    if (position == "top_left") {
+        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopLeftAnimation(QVariant)));
+    }
+    else if (position == "top_right") {
+        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopRightAnimation(QVariant)));
+    }
+    else if (position == "bottom_right") {
+        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomRightAnimation(QVariant)));
+    }
+    else if (position == "bottom_left") {
+        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomLeftAnimation(QVariant)));
+    }
 }
 
 void Widget::setupIcon()
