@@ -1,20 +1,14 @@
 #ifndef WIDGET_H
 #define WIDGET_H
 
-#include <boost/optional.hpp>
 #include <QtGui/QWidget>
-#include <QSystemTrayIcon>
 #include <QUdpSocket>
 #include <QLabel>
 #include <QQueue>
 #include "settings.h"
+#include "message.h"
+#include "dbusinterface.h"
 
-#define BO(t,a) boost::optional<t> a;
-
-struct Message
-{
-    QMap<QString, boost::optional<QVariant> > data;
-};
 
 class Widget : public QWidget
 {
@@ -26,6 +20,7 @@ public:
 private slots:
     void                    init();
     void                    onDataReceived();
+    void                    appendMessageToQueue(const Message& msg);
     void                    processMessageQueue();
     void                    updateTopLeftAnimation(QVariant value);
     void                    updateTopRightAnimation(QVariant value);
@@ -76,6 +71,7 @@ private:
     QMap<QString, QLabel*>  m_contentView;
     QQueue<Message>         m_messageQueue;
     QParallelAnimationGroup m_animation;
+    DBusInterface           m_dbus;
 };
 
 #endif // WIDGET_H

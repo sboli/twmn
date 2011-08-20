@@ -13,6 +13,7 @@
 #include <QDesktopWidget>
 #include <QPixmap>
 #include <QPainter>
+#include <QTextDocument>
 #include "settings.h"
 
 Widget::Widget()
@@ -28,11 +29,7 @@ Widget::Widget()
     connect(anim, SIGNAL(finished()), this, SLOT(reverseTrigger()));
     connectForPosition(m_settings.get("gui/position").toString());
     setFixedHeight(m_settings.get("gui/height").toInt());
-
-    /* DEBUG
-    Settings s("urgent");
-    qDebug() << s.get("main/duration").toInt();
-    //*/
+    connect(&m_dbus, SIGNAL(messageReceived(Message)), this, SLOT(appendMessageToQueue(Message)));
 }
 
 Widget::~Widget()
@@ -44,7 +41,6 @@ void Widget::init()
     int port = m_settings.get("main/port").toInt();
     if (!m_socket.bind(QHostAddress::Any, port)) {
         qCritical() << "Unable to listen port" << port;
-        close();
         return;
     }
     connect(&m_socket, SIGNAL(readyRead()), this, SLOT(onDataReceived()));
@@ -78,11 +74,12 @@ void Widget::onDataReceived()
     catch (const std::exception& e) {
         std::cout << "ERROR : " << e.what() << std::endl;
     }
-    if (m.data["icon"]) {
-        m.data["icon"].reset(loadPixmap(m.data["icon"]->toString()));
-    }
-    m_messageQueue.push_back(m);
-    // get out of here
+    appendMessageToQueue(m);
+}
+
+void Widget::appendMessageToQueue(const Message& msg)
+{
+    m_messageQueue.push_back(msg);
     QTimer::singleShot(30, this, SLOT(processMessageQueue()));
 }
 
@@ -172,11 +169,32 @@ int Widget::computeWidth()
     QFont boldFont = font();
     boldFont.setBold(true);
     int width = 0;
+    QString text = m_contentView["text"]->text();
+    width += QFontMetrics(boldFont).width(m_contentView["title"]->text());
+    if (Qt::mightBeRichText(text)) {
+        QTextDocument doc;
+        doc.setUseDesignMetrics(true);
+        doc.setHtml(text);
+        doc.setDefaultFont(font());
+        width += doc.idealWidth();
+        qDebug() << doc.toPlainText();
+    }
+    else
+        width += QFontMetrics(font()).width(text);
+    if (m.data["icon"])
+        width += m_contentView["icon"]->pixmap()->width();
+    return width;
+    /*
+    Message& m = m_messageQueue.front();
+    QFont boldFont = font();
+    boldFont.setBold(true);
+    int width = 0;
     width += QFontMetrics(boldFont).width(m_contentView["title"]->text())
             + QFontMetrics(font()).width(m_contentView["text"]->text());
     if (m.data["icon"])
         width += m_contentView["icon"]->pixmap()->width();
     return width;
+      */
 }
 
 void Widget::setupFont()
@@ -226,12 +244,22 @@ void Widget::connectForPosition(QString position)
 void Widget::setupIcon()
 {
     Message& m = m_messageQueue.front();
+    bool done = true;
     if (m.data["icon"]) {
-        //TODO: use height, if bigger then scale down
-        m_contentView["icon"]->setPixmap(qvariant_cast<QPixmap>(*m.data["icon"]).copy(0, 0, 15, 15));
+        QPixmap pix = qvariant_cast<QPixmap>(*m.data["icon"]);
+        if (pix.isNull())
+            pix = loadPixmap(m.data["icon"]->toString());
+        if (!pix.isNull())
+            m.data["icon"].reset(pix);
+        else if (pix.isNull())
+            done = false;
+        if (pix.height() > m.data["size"]->toInt())
+            pix = pix.scaled(m.data["size"]->toInt(), m.data["size"]->toInt());
+        m.data["icon"].reset(pix);
+        m_contentView["icon"]->setPixmap(pix);
         m_contentView["icon"]->setMaximumWidth(9999);
     }
-    else {
+    if (!done) {
         m_contentView["icon"]->setPixmap(QPixmap());
         m_contentView["icon"]->setFixedWidth(2);
     }
@@ -243,7 +271,7 @@ void Widget::setupTitle()
     boldFont.setBold(true);
     Message& m = m_messageQueue.front();
     if (m.data["title"]) {              // avoid ugly space if no icon is set
-        m_contentView["title"]->setText((m.data["icon"] ? " " : "") + m.data["title"]->toString());
+        m_contentView["title"]->setText((m.data["icon"] ? " " : "") + m.data["title"]->toString() + " ");
         m_contentView["title"]->setFont(boldFont);
         m_contentView["title"]->setMaximumWidth(9999);
     }
@@ -257,7 +285,7 @@ void Widget::setupContent()
 {
     Message& m = m_messageQueue.front();
     if (m.data["content"]) {
-        m_contentView["text"]->setText((m.data["icon"] || m.data["title"] ? " " : "") + m.data["content"]->toString() + " ");
+        m_contentView["text"]->setText((m.data["icon"] && !m.data["title"] ? " " : "") + m.data["content"]->toString() + " ");
         m_contentView["text"]->setMaximumWidth(9999);
     }
     else {
