@@ -27,6 +27,7 @@ int main(int argc, char** argv)
             ("sc", po::value<std::string>(), "A command to play a specific sound for this notification")
             ("bg", po::value<std::string>(), "The background color")
             ("fg", po::value<std::string>(), "The foreground color, which is the font color.")
+            ("id", po::value<int>(), "A message id. You should have given an id to the first message in order to modify it")
     ;
     po::variables_map vm;
     try {
@@ -55,10 +56,11 @@ int main(int argc, char** argv)
             if (vm.count("pos"))            root.add("pos", vm["pos"].as<std::string>());
             if (vm.count("fn"))             root.add("fn", vm["fn"].as<std::string>());
             if (vm.count("fs"))             root.add("fs", vm["fs"].as<std::string>());
-            if (vm.count("duration"))       root.add("duration", vm["duration"].as<std::string>());
+            if (vm.count("duration"))       root.add("duration", vm["duration"].as<int>());
             if (vm.count("sc"))             root.add("sc", vm["sc"].as<std::string>());
             if (vm.count("bg"))             root.add("bg", vm["bg"].as<std::string>());
             if (vm.count("fg"))             root.add("fg", vm["fg"].as<std::string>());
+            if (vm.count("id"))             root.add("id", vm["id"].as<int>());
             boost::property_tree::xml_parser::write_xml(out, tree);
         }
         //std::cout << out.str() << std::endl;
