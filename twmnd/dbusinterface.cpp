@@ -1,21 +1,21 @@
 #include "dbusinterface.h"
 #include <QDebug>
 #include <QTimer>
-#include <stdexcept>
 
 DBusInterface::DBusInterface(QObject *parent)
 {
+    Q_UNUSED(parent);
     DBusError dbus_err;
 
     dbus_error_init(&dbus_err);
 
     dbus_conn = dbus_bus_get(DBUS_BUS_SESSION, &dbus_err);
     if (!dbus_conn)
-        throw std::runtime_error(dbus_err.message);
+        return;
 
     int ret = dbus_bus_request_name(dbus_conn, "org.freedesktop.Notifications", DBUS_NAME_FLAG_REPLACE_EXISTING , &dbus_err);
     if (DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER != ret)
-        throw std::runtime_error(dbus_err.message);
+        return;
 
     dbus_error_free(&dbus_err);
     QTimer* timer = new QTimer(this);
@@ -23,6 +23,7 @@ DBusInterface::DBusInterface(QObject *parent)
     timer->setInterval(200);
     connect(timer, SIGNAL(timeout()), this, SLOT(check()));
     timer->start();
+    lastNid = 0;
 }
 
 void DBusInterface::check()
@@ -53,7 +54,7 @@ void DBusInterface::GetCapabilities(DBusMessage *msg)
     DBusMessageIter subargs;
     int ncaps = 1;
 
-    char *caps[1] = {"body"}, **ptr = caps;  // workaround (see specs)
+    const char *caps[1] = {"body"}, **ptr = caps;  // workaround (see specs)
     serial++;
 
     //printf("GetCapabilities called!\n");
@@ -77,7 +78,7 @@ void DBusInterface::GetServerInformation(DBusMessage *msg)
     DBusMessage* reply;
     DBusMessageIter args;
 
-    char* info[4] = {"twmnd", "twmnd", "2011", "2011"};
+    const char* info[4] = {"twmnd", "twmnd", "2011", "2011"};
     serial++;
 
     //printf("GetServerInfo called!\n");
@@ -97,6 +98,7 @@ void DBusInterface::GetServerInformation(DBusMessage *msg)
 
 void DBusInterface::CloseNotification(DBusMessage *msg)
 {
+    Q_UNUSED(msg);
     /*
     DBusMessage* reply;
     DBusMessageIter args;
@@ -136,13 +138,8 @@ void DBusInterface::Notify(DBusMessage *msg)
     const char* icon;
     dbus_uint32_t nid=0;
     dbus_int32_t expires=-1;
-    /*
-    notification *ptr = messages;
-    notification *note = NULL;
-    */
 
     serial++;
-
 
     dbus_message_iter_init(msg, &args);
     dbus_message_iter_get_basic(&args, &appname);
@@ -163,42 +160,26 @@ void DBusInterface::Notify(DBusMessage *msg)
     if (strlen(body))
         m.data["content"] = boost::optional<QVariant>(QString::fromAscii(body));
     if (strlen(summary))
-        m.data[m.data["content"] ? "title" : "content"] = boost::optional<QVariant>(QString::fromAscii(summary));
+        m.data[(m.data["content"] ? "title" : "content")] = boost::optional<QVariant>(QString::fromAscii(summary));
     if (strlen(icon))
         m.data["icon"] = boost::optional<QVariant>(QString::fromAscii(icon));
     if (expires != -1) {
         m.data["duration"] = boost::optional<QVariant>(int(expires));
     }
-    emit messageReceived(m);
-    /*
-    if( nid!=0 ) { // update existing message
-     note = messages;
-     if( note!=NULL )
-        while( note->nid != nid && note->next!=NULL ) note=note->next;
-
-     if( note==NULL || note->nid!=nid ) { // not found, re-create
-        note = calloc(sizeof(notification), 1);
-        note->nid=nid;
-        nid=0;
-      }
-    } else {
-      note = calloc(sizeof(notification), 1);
-      note->nid=curNid++;
-      note->started_at = time(NULL);
+    m.data["id"] = boost::optional<QVariant>(int(nid ?  nid : ++lastNid));
+    //qDebug() << "GOT : " << m.data["id"]->toInt();
+    //qDebug() << "ASKED: " << nid;
+    if (m.data["content"]) {
+        //qDebug() << "CONTENT: " << m.data["content"]->toString();
+        emit messageReceived(m);
     }
-*/
-
-    //note->expires_after = (time_t)(expires<0?EXPIRE_DEFAULT:expires*EXPIRE_MULT);
-    //note->closed=0;
-    //strncpy( note->appname, appname, 20);
-    //strncpy( note->summary, summary, 64);
-   // strncpy( note->body,    body, 256);
 
     reply = dbus_message_new_method_return(msg);
 
     dbus_message_iter_init_append(reply, &args);
-    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_UINT32, &nid) ||
+    int id = m.data["id"]->toInt();
+    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_UINT32, &id) ||
     !dbus_connection_send(dbus_conn, reply, &serial))
-     return;
+        return;
     dbus_message_unref(reply);
 }

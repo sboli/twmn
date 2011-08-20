@@ -29,6 +29,8 @@ private slots:
     void                    reverseTrigger();
     void                    reverseStart();
 
+    void                    updateFinalWidth();
+
 private:
     /*!
       * \brief Get the final width of the slide after everything is set.
@@ -65,6 +67,9 @@ private:
       * \brief Tries to load a Pixmap from pattern : from a file, from a setting value.
       */
     QPixmap                 loadPixmap(QString pattern);
+
+    bool                    update(const Message& m);
+
 private:
     Settings                m_settings;
     QUdpSocket              m_socket;
@@ -72,6 +77,7 @@ private:
     QQueue<Message>         m_messageQueue;
     QParallelAnimationGroup m_animation;
     DBusInterface           m_dbus;
+    QTimer                  m_visible;
 };
 
 #endif // WIDGET_H

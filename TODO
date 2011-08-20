@@ -1,5 +1,3 @@
-- Match twmnc with notify-send so an alias can make it
-- DBUS support
 - Index de notification pour pouvoir la remplacer par la suite.
 - Possibilité d'afficher plusieurs notifications l'une sous l'autre
 - Pour ceux qui n'utilisent pas trop la souris, un raccourci clavier pour sélectionner la première notification,

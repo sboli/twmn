@@ -30,6 +30,8 @@ Widget::Widget()
     connectForPosition(m_settings.get("gui/position").toString());
     setFixedHeight(m_settings.get("gui/height").toInt());
     connect(&m_dbus, SIGNAL(messageReceived(Message)), this, SLOT(appendMessageToQueue(Message)));
+    connect(&m_visible, SIGNAL(timeout()), this, SLOT(reverseStart()));
+    m_visible.setSingleShot(true);
 }
 
 Widget::~Widget()
@@ -79,8 +81,12 @@ void Widget::onDataReceived()
 
 void Widget::appendMessageToQueue(const Message& msg)
 {
-    m_messageQueue.push_back(msg);
-    QTimer::singleShot(30, this, SLOT(processMessageQueue()));
+    if (msg.data["id"] && !m_messageQueue.isEmpty() && update(msg))
+        ;
+    else {
+        m_messageQueue.push_back(msg);
+        QTimer::singleShot(30, this, SLOT(processMessageQueue()));
+    }
 }
 
 void Widget::processMessageQueue()
@@ -152,12 +158,14 @@ void Widget::reverseTrigger()
         QTimer::singleShot(30, this, SLOT(processMessageQueue()));
         return;
     }
-    QTimer::singleShot(m_messageQueue.front().data["duration"]->toInt(), this, SLOT(reverseStart()));
-    m_messageQueue.pop_front();
+    m_visible.setInterval(m_messageQueue.front().data["duration"]->toInt());
+    m_visible.start();
 }
 
 void Widget::reverseStart()
 {
+    if (!m_messageQueue.isEmpty())
+        m_messageQueue.pop_front();
     m_animation.setDirection(QAnimationGroup::Backward);
     qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEasingCurve(QEasingCurve::InCubic);
     m_animation.start();
@@ -177,24 +185,12 @@ int Widget::computeWidth()
         doc.setHtml(text);
         doc.setDefaultFont(font());
         width += doc.idealWidth();
-        qDebug() << doc.toPlainText();
     }
     else
         width += QFontMetrics(font()).width(text);
     if (m.data["icon"])
         width += m_contentView["icon"]->pixmap()->width();
     return width;
-    /*
-    Message& m = m_messageQueue.front();
-    QFont boldFont = font();
-    boldFont.setBold(true);
-    int width = 0;
-    width += QFontMetrics(boldFont).width(m_contentView["title"]->text())
-            + QFontMetrics(font()).width(m_contentView["text"]->text());
-    if (m.data["icon"])
-        width += m_contentView["icon"]->pixmap()->width();
-    return width;
-      */
 }
 
 void Widget::setupFont()
@@ -347,4 +343,47 @@ QPixmap Widget::loadPixmap(QString pattern)
     return icon;
 }
 
+bool Widget::update(const Message &m)
+{
+    bool found = false;
+    for (QQueue<Message>::iterator it = m_messageQueue.begin(); it != m_messageQueue.end(); ++it) {
+        if (it->data["id"] && it->data["id"]->toInt() == m.data["id"]->toInt()) {
+            it->data = m.data;
+            //qDebug() << "UPDATED : " << m.data["id"]->toInt();
+            found = true;
+        }
+    }
+    if (found && !m_messageQueue.isEmpty() && m_messageQueue.front().data["id"]->toInt() == m.data["id"]->toInt()) {
+        qDebug() << "here you go ";
+        loadDefaults();
+        setupFont();
+        setupColors();
+        setupIcon();
+        setupTitle();
+        setupContent();
+        updateFinalWidth();
+        m_visible.start();
+    }
+    return found;
+}
 
+void Widget::updateFinalWidth()
+{
+    if (m_messageQueue.empty())
+        return;
+    QString position = m_messageQueue.front().data["pos"]->toString();
+    int width = computeWidth();
+    qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEndValue(width);
+    if (position == "top_left") {
+        updateTopLeftAnimation(width);
+    }
+    else if (position == "top_right") {
+        updateTopRightAnimation(width);
+    }
+    else if (position == "bottom_right") {
+        updateBottomRightAnimation(width);
+    }
+    else if (position == "bottom_left") {
+        updateBottomLeftAnimation(width);
+    }
+}

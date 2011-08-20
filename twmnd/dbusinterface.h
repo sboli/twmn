@@ -27,6 +27,7 @@ signals:
 private:
     DBusConnection* dbus_conn;
     dbus_uint32_t   serial;
+    int             lastNid;
 };
 
 #endif // DBUSINTERFACE_H
