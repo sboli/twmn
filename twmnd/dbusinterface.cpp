@@ -133,6 +133,7 @@ void DBusInterface::Notify(DBusMessage *msg)
     const char *appname;
     const char *summary;
     const char *body;
+    const char* icon;
     dbus_uint32_t nid=0;
     dbus_int32_t expires=-1;
     /*
@@ -148,7 +149,8 @@ void DBusInterface::Notify(DBusMessage *msg)
     dbus_message_iter_next( &args );
     dbus_message_iter_get_basic(&args, &nid);
     dbus_message_iter_next( &args );
-    dbus_message_iter_next( &args );  // skip icon
+    dbus_message_iter_get_basic(&args, &icon);
+    dbus_message_iter_next( &args );
     dbus_message_iter_get_basic(&args, &summary);
     dbus_message_iter_next( &args );
     dbus_message_iter_get_basic(&args, &body);
@@ -158,10 +160,15 @@ void DBusInterface::Notify(DBusMessage *msg)
     dbus_message_iter_get_basic(&args, &expires);
 
     Message m;
-    if (strlen(body) != 0)
+    if (strlen(body))
         m.data["content"] = boost::optional<QVariant>(QString::fromAscii(body));
-    if (strlen(summary) != 0)
+    if (strlen(summary))
         m.data[m.data["content"] ? "title" : "content"] = boost::optional<QVariant>(QString::fromAscii(summary));
+    if (strlen(icon))
+        m.data["icon"] = boost::optional<QVariant>(QString::fromAscii(icon));
+    if (expires != -1) {
+        m.data["duration"] = boost::optional<QVariant>(int(expires));
+    }
     emit messageReceived(m);
     /*
     if( nid!=0 ) { // update existing message
