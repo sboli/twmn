@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui network
-
+DEFINES += QT_NO_DEBUG_OUTPUT
 TARGET = twmnd
 TEMPLATE = app
 CONFIG += release

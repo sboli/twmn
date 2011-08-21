@@ -196,8 +196,9 @@ int Widget::computeWidth()
 void Widget::setupFont()
 {
     Message& m = m_messageQueue.front();
-    QFont font(m.data["fn"]->toString());
+    QFont font;
     font.setPixelSize(m.data["fs"]->toInt());
+    font.setRawName(m.data["fn"]->toString());
     QApplication::setFont(font);
 }
 
@@ -354,7 +355,6 @@ bool Widget::update(const Message &m)
         }
     }
     if (found && !m_messageQueue.isEmpty() && m_messageQueue.front().data["id"]->toInt() == m.data["id"]->toInt()) {
-        qDebug() << "here you go ";
         loadDefaults();
         setupFont();
         setupColors();
