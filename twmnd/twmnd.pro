@@ -10,10 +10,14 @@ TARGET = twmnd
 TEMPLATE = app
 CONFIG += release
 DESTDIR = ../bin/
-
+LIBS += `pkg-config --libs-only-l dbus-1`
+QMAKE_CXXFLAGS += `pkg-config --cflags-only-I dbus-1`
 SOURCES += main.cpp\
         widget.cpp \
-    settings.cpp
+    settings.cpp \
+    dbusinterface.cpp
 
 HEADERS  += widget.h \
-    settings.h
+    settings.h \
+    dbusinterface.h \
+    message.h
