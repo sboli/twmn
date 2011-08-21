@@ -91,6 +91,8 @@ void Widget::appendMessageToQueue(const Message& msg)
 
 void Widget::processMessageQueue()
 {
+    if (m_settings.has("gui/always_on_top") && m_settings.get("gui/always_on_top").toBool())
+        setWindowFlags(Qt::ToolTip | Qt::WindowStaysOnTopHint | Qt::X11BypassWindowManagerHint);
     if (m_messageQueue.empty())
         return;
     if (m_animation.state() == QAbstractAnimation::Running || (m_animation.totalDuration()-m_animation.currentTime()) < 50)
