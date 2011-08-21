@@ -90,7 +90,6 @@ int main(int argc, char** argv)
                 else                        root.add("aot", true);
             boost::property_tree::xml_parser::write_xml(out, tree);
         }
-        std::cout << out.str() << std::endl;
         io_service ios;
         ip::udp::socket s(ios, ip::udp::endpoint(ip::udp::v4(), 0));
         int port = vm.count("port") ? vm["port"].as<int>() : DEFAULT_PORT;
