@@ -53,24 +53,26 @@ void DBusInterface::GetCapabilities(DBusMessage *msg)
     DBusMessageIter args;
     DBusMessageIter subargs;
     int ncaps = 1;
+    char dummy[256];
 
     const char *caps[1] = {"body"}, **ptr = caps;  // workaround (see specs)
     serial++;
 
-    //printf("GetCapabilities called!\n");
+    printf("GetCapabilities called!\n");
 
     reply = dbus_message_new_method_return(msg);
     if(!reply)
        return;
 
     dbus_message_iter_init_append(reply, &args);
-    if (!dbus_message_iter_open_container(&args, DBUS_TYPE_ARRAY, NULL, &subargs ) ||
+    if (!dbus_message_iter_open_container(&args, DBUS_TYPE_ARRAY, dummy, &subargs ) ||
            !dbus_message_iter_append_fixed_array(&subargs, DBUS_TYPE_STRING, &ptr, ncaps) ||
            !dbus_message_iter_close_container(&args, &subargs) ||
-    !dbus_connection_send(dbus_conn, reply, &serial))
+           !dbus_connection_send(dbus_conn, reply, &serial))
         return;
 
     dbus_message_unref(reply);
+    qDebug() << dummy;
 }
 
 void DBusInterface::GetServerInformation(DBusMessage *msg)
