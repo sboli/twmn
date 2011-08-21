@@ -4,7 +4,31 @@
 #include <boost/asio.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+#include <boost/tuple/tuple.hpp>
 #include <exception>
+#include <unistd.h>
+
+std::string DEFAULT_HOST = "127.0.0.1";
+const int   DEFAULT_PORT = 9797;
+
+/*!
+  * \brief Read the port from the config file
+  * \return true if the port was found
+  * \param port the port to use
+  */
+bool read_port(int& port)
+{
+    std::string path = getenv("XDG_CONFIG_HOME");
+    path += "/twmn/twmn.conf";
+    std::ifstream in(path.c_str());
+    if (!in)
+        return false;
+    boost::property_tree::ptree tree;
+    boost::property_tree::ini_parser::read_ini(in, tree);
+    boost::optional<int> value =  tree.get_optional<int>("main.port");
+    return value ? port = *value : false;
+}
 
 int main(int argc, char** argv)
 {
@@ -16,8 +40,8 @@ int main(int argc, char** argv)
                                                   " in the config file or a file path.")
             ("title,t", po::value<std::string>(), "A title for the notification.")
             ("content,c", po::value<std::string>(), "A content for this notification")
-            ("host,H", po::value<std::string>()->default_value("127.0.0.1"), "The host ip address (x.x.x.x).")
-            ("port,p", po::value<int>()->default_value(9797), "The port to use.")
+            ("host,H", po::value<std::string>()->default_value(DEFAULT_HOST), ("The host ip address (x.x.x.x). Default is " + DEFAULT_HOST).c_str())
+            ("port,p", po::value<int>(), "The port to use. Default setting is loaded from the config file.")
             ("layout,l", po::value<std::string>(), "The layout to use. The name of a configuration file.")
             ("size,s", po::value<int>(), "The height of this notification. If not specified the configuration file value is used.")
             ("pos", po::value<std::string>(), "Position of this notification. Either top_right, top_left, bottom_right or bottom_left.")
@@ -66,11 +90,14 @@ int main(int argc, char** argv)
         //std::cout << out.str() << std::endl;
         io_service ios;
         ip::udp::socket s(ios, ip::udp::endpoint(ip::udp::v4(), 0));
-        s.send_to(buffer(out.str()), ip::udp::endpoint(ip::address(ip::address_v4::from_string(vm["host"].as<std::string>())), vm["port"].as<int>()));
+        int port = vm.count("port") ? vm["port"].as<int>() : DEFAULT_PORT;
+        if (!vm.count("port"))
+            read_port(port);
+        s.send_to(buffer(out.str()), ip::udp::endpoint(ip::address(ip::address_v4::from_string(vm["host"].as<std::string>())), port));
         ios.run();
     }
     catch (std::exception& e) {
-        std::cout << e.what() << std::endl;
+        std::cout << "here you are" << e.what() << std::endl;
     }
     return 0;
 }
