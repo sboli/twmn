@@ -1,4 +1,5 @@
 #include "settings.h"
+#include <iostream>
 
 Settings::Settings(QString file) : m_file(file)
 {
@@ -7,7 +8,8 @@ Settings::Settings(QString file) : m_file(file)
     m_defaultSettings["main/duration"] = "3000";
     m_defaultSettings["gui/position"] = "top_right";
     m_defaultSettings["gui/height"] = 18;
-    m_defaultSettings["gui/font_size"] = 18;
+    m_defaultSettings["gui/font"] = "Sans";
+    m_defaultSettings["gui/font_size"] = 13;
     m_defaultSettings["gui/foreground_color"] = "#999999";
     m_defaultSettings["gui/background_color"] = "#000000";
     m_defaultSettings["icons/critical_icon"] = "";
@@ -42,7 +44,8 @@ QVariant Settings::get(QString setting)
 {
     if (!m_data.contains(setting)) {
         if (!m_defaultSettings.contains(setting)) {
-            qCritical() << "Settings::get(QString setting): Attempt to get a non existing setting";
+            std::cout << ("Attempt to get a non existing setting.\n"
+                          "You might want to create a key for " + setting + " in the config file.").toStdString();
             qApp->quit();
         }
         return m_defaultSettings[setting];
