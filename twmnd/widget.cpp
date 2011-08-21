@@ -103,8 +103,6 @@ void Widget::processMessageQueue()
     qDebug() << m.data["aot"]->toBool();
     if (m.data["aot"]->toBool())
         raise();
-    else
-        lower();
     setupFont();
     setupColors();
     setupIcon();
