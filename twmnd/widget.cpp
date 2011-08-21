@@ -91,8 +91,6 @@ void Widget::appendMessageToQueue(const Message& msg)
 
 void Widget::processMessageQueue()
 {
-    if (m_settings.has("gui/always_on_top") && m_settings.get("gui/always_on_top").toBool())
-        setWindowFlags(Qt::ToolTip | Qt::WindowStaysOnTopHint | Qt::X11BypassWindowManagerHint);
     if (m_messageQueue.empty())
         return;
     if (m_animation.state() == QAbstractAnimation::Running || (m_animation.totalDuration()-m_animation.currentTime()) < 50)
@@ -102,6 +100,11 @@ void Widget::processMessageQueue()
     Message& m = m_messageQueue.front();
     loadDefaults();
     setFixedHeight(m.data["size"]->toInt());
+    qDebug() << m.data["aot"]->toBool();
+    if (m.data["aot"]->toBool())
+        raise();
+    else
+        lower();
     setupFont();
     setupColors();
     setupIcon();
@@ -324,6 +327,8 @@ void Widget::loadDefaults()
         m.data["size"] = boost::optional<QVariant>(s->get("gui/height"));
     if (!m.data["icon"])
         m.data["icon"] = loadPixmap(s->has("gui/icon") ? s->get("gui/icon").toString() : "");
+    if (!m.data["aot"])
+        m.data["aot"] = boost::optional<QVariant>(s->get("gui/always_on_top"));
     if (s != &m_settings)
         delete s;
 }
