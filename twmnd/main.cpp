@@ -5,8 +5,33 @@
 #include <QTranslator>
 #include "widget.h"
 
+void logOutput(QtMsgType type, const char *msg)
+{
+#ifdef QT_NO_DEBUG_OUTPUT
+    return;
+#else
+    std::cout << "[" << QTime::currentTime().toString("hh:mm:ss").toStdString() << "]";
+    switch (type){
+    case QtDebugMsg:
+        std::cout << " " << msg;
+        break;
+    case QtWarningMsg:
+        std::cout << "[warning] " << msg;
+        break;
+    case QtCriticalMsg:
+        std::cout << "[critical] " << msg;
+        break;
+    case QtFatalMsg:
+        std::cout << "[fatal] " << msg;
+        break;
+    }
+    std::cout << std::endl;
+#endif
+}
+
 int main(int argc, char *argv[])
 {
+    qInstallMsgHandler(logOutput);
     QApplication a(argc, argv);
     QApplication::setQuitOnLastWindowClosed(true);
     QApplication::setApplicationName("twmn");
