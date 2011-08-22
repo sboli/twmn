@@ -34,6 +34,14 @@ Widget::Widget() : m_shortcutGrabber(this, m_settings)
     connect(&m_visible, SIGNAL(timeout()), this, SLOT(reverseStart()));
     m_visible.setSingleShot(true);
     QAbstractEventDispatcher::instance()->setEventFilter(ShortcutGrabber::eventFilter);
+    QHBoxLayout* l = new QHBoxLayout;
+    l->setSizeConstraint(QLayout::SetNoConstraint);
+    l->setMargin(0);
+    l->setContentsMargins(0, 0, 0, 0);
+    setLayout(l);
+    l->addWidget(m_contentView["icon"] = new QLabel);
+    l->addWidget(m_contentView["title"] = new QLabel);
+    l->addWidget(m_contentView["text"] = new QLabel);
     // Let the event loop run
     QTimer::singleShot(30, this, SLOT(init()));
 }
@@ -50,14 +58,6 @@ void Widget::init()
         return;
     }
     connect(&m_socket, SIGNAL(readyRead()), this, SLOT(onDataReceived()));
-    QHBoxLayout* l = new QHBoxLayout;
-    l->setSizeConstraint(QLayout::SetNoConstraint);
-    l->setMargin(0);
-    l->setContentsMargins(0, 0, 0, 0);
-    setLayout(l);
-    l->addWidget(m_contentView["icon"] = new QLabel);
-    l->addWidget(m_contentView["title"] = new QLabel);
-    l->addWidget(m_contentView["text"] = new QLabel);
     m_shortcutGrabber.loadShortcuts();
 }
 
@@ -173,12 +173,12 @@ void Widget::reverseTrigger()
 
 void Widget::reverseStart()
 {
+    m_shortcutGrabber.disableShortcuts();
     if (!m_messageQueue.isEmpty())
         m_messageQueue.pop_front();
     m_animation.setDirection(QAnimationGroup::Backward);
     qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEasingCurve(QEasingCurve::InCubic);
     m_animation.start();
-    m_shortcutGrabber.disableShortcuts();
 }
 
 int Widget::computeWidth()
@@ -334,6 +334,8 @@ void Widget::loadDefaults()
         m.data["icon"] = loadPixmap(s->has("gui/icon") ? s->get("gui/icon").toString() : "");
     if (!m.data["aot"])
         m.data["aot"] = boost::optional<QVariant>(s->get("gui/always_on_top"));
+    if (!m.data["ac"])
+        m.data["ac"] = boost::optional<QVariant>(s->get("main/activate_command"));
     if (s != &m_settings)
         delete s;
 }
@@ -402,4 +404,25 @@ void Widget::updateFinalWidth()
     else if (position == "bottom_left") {
         updateBottomLeftAnimation(width);
     }
+}
+
+void Widget::onPrevious()
+{
+    // TODO: After stacking
+}
+
+void Widget::onNext()
+{
+    // TODO: After stacking
+}
+
+void Widget::onActivate()
+{
+    QProcess::startDetached(m_messageQueue.front().data["ac"]->toString());
+    m_visible.start();
+}
+
+void Widget::onHide()
+{
+
 }
