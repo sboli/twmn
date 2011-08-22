@@ -16,6 +16,7 @@
 #include <QTextDocument>
 #include <QShortcut>
 #include <QIcon>
+#include <QWheelEvent>
 #include "settings.h"
 #include "shortcutgrabber.h"
 
@@ -425,4 +426,19 @@ void Widget::onActivate()
 void Widget::onHide()
 {
 
+}
+
+void Widget::mousePressEvent(QMouseEvent *e)
+{
+    onActivate();
+    QWidget::mousePressEvent(e);
+}
+
+void Widget::wheelEvent(QWheelEvent *e)
+{
+    if (e->delta() > 0)
+        onPrevious();
+    else if (e->delta() < 0)
+        onNext();
+    QWidget::wheelEvent(e);
 }
