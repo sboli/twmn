@@ -86,8 +86,7 @@ int main(int argc, char** argv)
             if (vm.count("bg"))             root.add("bg", vm["bg"].as<std::string>());
             if (vm.count("fg"))             root.add("fg", vm["fg"].as<std::string>());
             if (vm.count("id"))             root.add("id", vm["id"].as<int>());
-            if (!vm.count("aot"))           root.add("aot", false);
-                else                        root.add("aot", true);
+            if (vm.count("aot"))            root.add("aot", true);
             boost::property_tree::xml_parser::write_xml(out, tree);
         }
         io_service ios;

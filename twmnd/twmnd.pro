@@ -15,9 +15,11 @@ QMAKE_CXXFLAGS += `pkg-config --cflags-only-I dbus-1`
 SOURCES += main.cpp\
         widget.cpp \
     settings.cpp \
-    dbusinterface.cpp
+    dbusinterface.cpp \
+    shortcutgrabber.cpp
 
 HEADERS  += widget.h \
     settings.h \
     dbusinterface.h \
-    message.h
+    message.h \
+    shortcutgrabber.h

@@ -14,13 +14,14 @@
 #include <QPixmap>
 #include <QPainter>
 #include <QTextDocument>
+#include <QShortcut>
+#include <QIcon>
 #include "settings.h"
+#include "shortcutgrabber.h"
 
-Widget::Widget()
+Widget::Widget() : m_shortcutGrabber(this, m_settings)
 {
     setWindowFlags(Qt::ToolTip);
-    // Let the event loop run
-    QTimer::singleShot(30, this, SLOT(init()));
     QPropertyAnimation* anim = new QPropertyAnimation;
     anim->setTargetObject(this);
     m_animation.addAnimation(anim);
@@ -32,6 +33,9 @@ Widget::Widget()
     connect(&m_dbus, SIGNAL(messageReceived(Message)), this, SLOT(appendMessageToQueue(Message)));
     connect(&m_visible, SIGNAL(timeout()), this, SLOT(reverseStart()));
     m_visible.setSingleShot(true);
+    QAbstractEventDispatcher::instance()->setEventFilter(ShortcutGrabber::eventFilter);
+    // Let the event loop run
+    QTimer::singleShot(30, this, SLOT(init()));
 }
 
 Widget::~Widget()
@@ -54,6 +58,7 @@ void Widget::init()
     l->addWidget(m_contentView["icon"] = new QLabel);
     l->addWidget(m_contentView["title"] = new QLabel);
     l->addWidget(m_contentView["text"] = new QLabel);
+    m_shortcutGrabber.loadShortcuts();
 }
 
 void Widget::onDataReceived()
@@ -118,6 +123,7 @@ void Widget::processMessageQueue()
     QString soundCommand = m.data["sc"]->toString();
     if (!soundCommand.isEmpty())
         QProcess::startDetached(soundCommand);
+    m_shortcutGrabber.enableShortcuts();
 }
 
 void Widget::updateTopLeftAnimation(QVariant value)
@@ -172,6 +178,7 @@ void Widget::reverseStart()
     m_animation.setDirection(QAnimationGroup::Backward);
     qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEasingCurve(QEasingCurve::InCubic);
     m_animation.start();
+    m_shortcutGrabber.disableShortcuts();
 }
 
 int Widget::computeWidth()
@@ -338,12 +345,16 @@ QPixmap Widget::loadPixmap(QString pattern)
         if (m_settings.has("icons/" + pattern))
             icon = QPixmap(m_settings.get("icons/" + pattern).toString());
         else {
-            QImage img(1, 1, QImage::Format_ARGB32);
-            QPainter p;
-            p.begin(&img);
-            p.fillRect(0, 0, 1, 1, QBrush(QColor::fromRgb(255, 255, 255, 0)));
-            p.end();
-            icon = QPixmap::fromImage(img);
+            ///TODO: Load standard icons. Surprisingly this doesn't work
+            //icon = QIcon::fromTheme(pattern).pixmap(999, 999);
+            //if (icon.isNull()) {
+                QImage img(1, 1, QImage::Format_ARGB32);
+                QPainter p;
+                p.begin(&img);
+                p.fillRect(0, 0, 1, 1, QBrush(QColor::fromRgb(255, 255, 255, 0)));
+                p.end();
+                icon = QPixmap::fromImage(img);
+            //}
         }
     }
     return icon;

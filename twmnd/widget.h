@@ -8,7 +8,7 @@
 #include "settings.h"
 #include "message.h"
 #include "dbusinterface.h"
-
+#include "shortcutgrabber.h"
 
 class Widget : public QWidget
 {
@@ -30,6 +30,30 @@ private slots:
     void                    reverseStart();
 
     void                    updateFinalWidth();
+
+public slots:
+    void                    onPrevious()
+    {
+
+        qDebug() << "next";
+    }
+
+    void                    onNext()
+    {
+        qDebug() << "next";
+    }
+
+    void                    onActivate()
+    {
+        qDebug() << "next";
+
+    }
+
+    void                    onHide()
+    {
+
+        qDebug() << "next";
+    }
 
 private:
     /*!
@@ -78,6 +102,7 @@ private:
     QParallelAnimationGroup m_animation;
     DBusInterface           m_dbus;
     QTimer                  m_visible;
+    ShortcutGrabber         m_shortcutGrabber;
 };
 
 #endif // WIDGET_H
