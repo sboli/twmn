@@ -31,29 +31,26 @@ private slots:
 
     void                    updateFinalWidth();
 
+
 public slots:
-    void                    onPrevious()
-    {
+    // Called from the ShortcutGrabber
+    void                    onPrevious();   ///< TODO
 
-        qDebug() << "next";
-    }
+    void                    onNext();       ///< TODO
 
-    void                    onNext()
-    {
-        qDebug() << "next";
-    }
+    /*!
+      * \brief Run a command when the user activate the notification
+      */
+    void                    onActivate();
 
-    void                    onActivate()
-    {
-        qDebug() << "next";
+    /*!
+      * \brief Hide the notification
+      */
+    void                    onHide();
 
-    }
+    void                    mousePressEvent(QMouseEvent *);
 
-    void                    onHide()
-    {
-
-        qDebug() << "next";
-    }
+    void                    wheelEvent(QWheelEvent *e);
 
 private:
     /*!
@@ -65,6 +62,9 @@ private:
 
     void                    setupColors();
 
+    /*!
+      * \brief Create an appropriate connection according to the position parameter from Settings
+      */
     void                    connectForPosition(QString position);
 
     /*!
@@ -92,6 +92,10 @@ private:
       */
     QPixmap                 loadPixmap(QString pattern);
 
+    /*!
+      * \brief Update the message m if it's already in the queue
+      * \return true if a message has been updated
+      */
     bool                    update(const Message& m);
 
 private:

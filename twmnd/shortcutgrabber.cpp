@@ -72,7 +72,7 @@ void ShortcutGrabber::disableShortcuts()
         quint32 nativeMods = i.get<1>();
         defaultXErrhandler = XSetErrorHandler(xErrhandler);
         XUngrabKey(display, nativeKey, nativeMods, window);
-        XUngrabKey(display, nativeKey, nativeMods | Mod2Mask, window); // allow numlock
+        XUngrabKey(display, nativeKey, nativeMods | Mod2Mask, window);
         XSync(display, False);
         XSetErrorHandler(defaultXErrhandler);
     }
@@ -98,7 +98,7 @@ void ShortcutGrabber::loadShortcuts()
     if (!configAllowShortcut())
         return;
     Display* display = QX11Info::display();
-    // reading the modifier QKeySequence as a string fix the + problem at the end in case of multiple modifiers
+    // reading the modifier QKeySequence as a string fixes the + problem at the end in case of multiple modifiers
     QString tmp = m_settings.get("shortcuts/modifiers").toString();
     QKeySequence modSeq;
     if (!tmp.endsWith("+"))
@@ -136,7 +136,10 @@ bool ShortcutGrabber::configAllowShortcut()
 
 void ShortcutGrabber::propagate(const Shortcut &shortcut)
 {
-    switch (*shortcutToAction(shortcut)) {
+    const boost::optional<Action> shortcutWithAction = shortcutToAction(shortcut);
+    if (!shortcutWithAction)
+        return;
+    switch (*shortcutWithAction) {
     case PREVIOUS:
         m_widget->onPrevious();
         break;

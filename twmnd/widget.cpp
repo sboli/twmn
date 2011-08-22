@@ -108,7 +108,6 @@ void Widget::processMessageQueue()
     Message& m = m_messageQueue.front();
     loadDefaults();
     setFixedHeight(m.data["size"]->toInt());
-    qDebug() << m.data["aot"]->toBool();
     if (m.data["aot"]->toBool())
         raise();
     setupFont();
@@ -371,7 +370,6 @@ bool Widget::update(const Message &m)
     for (QQueue<Message>::iterator it = m_messageQueue.begin(); it != m_messageQueue.end(); ++it) {
         if (it->data["id"] && it->data["id"]->toInt() == m.data["id"]->toInt()) {
             it->data = m.data;
-            //qDebug() << "UPDATED : " << m.data["id"]->toInt();
             found = true;
         }
     }

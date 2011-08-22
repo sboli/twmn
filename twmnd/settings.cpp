@@ -1,11 +1,14 @@
 #include "settings.h"
 #include <iostream>
+#include <QKeySequence>
 
 Settings::Settings(QString file) : m_file(file)
 {
     m_defaultSettings["main/port"] = 9797;
     m_defaultSettings["main/sound_command"] = "";
+    m_defaultSettings["main/activate_command"] = "";
     m_defaultSettings["main/duration"] = "3000";
+    m_defaultSettings["main/enable_shortcuts"] = true;
     m_defaultSettings["gui/position"] = "top_right";
     m_defaultSettings["gui/height"] = 18;
     m_defaultSettings["gui/font"] = "Sans";
@@ -16,6 +19,11 @@ Settings::Settings(QString file) : m_file(file)
     m_defaultSettings["icons/critical_icon"] = "";
     m_defaultSettings["icons/warning_icon"] = "";
     m_defaultSettings["icons/info_icon"] = "";
+    m_defaultSettings["shortcuts/modifiers"] = QKeySequence(Qt::AltModifier);
+    m_defaultSettings["shortcuts/previous"] = QKeySequence("K");
+    m_defaultSettings["shortcuts/next"] = QKeySequence("J");
+    m_defaultSettings["shortcuts/activate"] = QKeySequence("Return");
+    m_defaultSettings["shortcuts/hide"] = QKeySequence("X");
     reload();
 }
 

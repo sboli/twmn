@@ -100,7 +100,7 @@ int main(int argc, char** argv)
         ios.run();
     }
     catch (std::exception& e) {
-        std::cout << "here you are" << e.what() << std::endl;
+        std::cout << "ERROR : " << e.what() << std::endl;
     }
     return 0;
 }

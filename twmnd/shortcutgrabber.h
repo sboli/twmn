@@ -15,22 +15,37 @@ class ShortcutGrabber : public QObject
 {
     Q_OBJECT
     friend bool eventFilter(void *message);
-    enum Action { PREVIOUS, NEXT, ACTIVATE, HIDE};
-    typedef boost::tuples::tuple<quint32, quint32, Action> Shortcut;
+    enum Action { PREVIOUS, NEXT, ACTIVATE, HIDE};      ///< An action \see Settings
+    typedef boost::tuples::tuple<quint32, quint32, Action> Shortcut;    ///< A shortcut (X11 key, X11 mod, action) \see Action
+
 public:
     explicit ShortcutGrabber(QObject *parent, Settings& settings_);
+
+    /*!
+      * \brief Workaround to grab X11 input.
+      */
     static bool eventFilter(void* message);
 
+    /*!
+      * \brief Load the shortcuts from the configuration file
+      */
     void        loadShortcuts();
 
     /*!
+      * \brief It this return false then \see loadShortcuts \see enableShortcuts \see disableShortcuts won't work.
       * \return true if shortcuts is enabled from the config file.
       */
     bool        configAllowShortcut();
 
 public slots:
+    /*!
+      * \brief Enable the shortcuts if any is found
+      */
     void        enableShortcuts();
 
+    /*!
+      * \brief Disable shortcuts
+      */
     void        disableShortcuts();
 
 private:
