@@ -43,6 +43,8 @@ Widget::Widget() : m_shortcutGrabber(this, m_settings)
     l->addWidget(m_contentView["icon"] = new QLabel);
     l->addWidget(m_contentView["title"] = new QLabel);
     l->addWidget(m_contentView["text"] = new QLabel);
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onHide()));
     // Let the event loop run
     QTimer::singleShot(30, this, SLOT(init()));
 }
@@ -425,12 +427,13 @@ void Widget::onActivate()
 
 void Widget::onHide()
 {
-
+    qDebug() << "hide";
 }
 
 void Widget::mousePressEvent(QMouseEvent *e)
 {
-    onActivate();
+    if (e->button() == Qt::LeftButton)
+        onActivate();
     QWidget::mousePressEvent(e);
 }
 
