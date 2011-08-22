@@ -43,14 +43,17 @@ so no popup, just a notification slide.
     modifiers : One or Many modifiers (up to three) for twmnd. To use in combinaison with one of the key below
                 in order to trigger an action. Default : Alt
 
-    previous : (Not available yet) Combined with the modifiers, this key shows the previous notification. Mouse wheel up has the same effect.
+    previous : (Not available yet) Combined with the modifiers, this key shows the previous notification.
+               Default : K. Mouse wheel up has the same effect.
 
-    next : (Not available yet) Combined with the modifiers, this key shows the next notification. Mouse wheel down has the same effect.
+    next : (Not available yet) Combined with the modifiers, this key shows the next notification.
+           Default : J. Mouse wheel down has the same effect.
 
     activate : Still combined with the modifiers, this key activate the notification.
-               It runs the command defined for activate_command.
+               Simply runs the command defined for activate_command. Default : Return.
+               Mouse left click has the same effect.
 
-    hide : This key hide the notification.
+    hide : This key hide the notification. Default : X. Mouse Right click has the same effect.
 
 
 
