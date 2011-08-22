@@ -427,7 +427,8 @@ void Widget::onActivate()
 
 void Widget::onHide()
 {
-    qDebug() << "hide";
+    m_visible.setInterval(2);
+    m_visible.start();
 }
 
 void Widget::mousePressEvent(QMouseEvent *e)
