@@ -53,6 +53,7 @@ int main(int argc, char** argv)
             ("fg", po::value<std::string>(), "The foreground color, which is the font color.")
             ("id", po::value<int>(), "A message id. You should have given an id to the first message in order to modify it")
             ("aot", "Always on top. Specially on fullscreen applications, default.")
+            ("ac", po::value<std::string>(), "A command to run when the notification is activated.")
     ;
     po::variables_map vm;
     try {
@@ -87,6 +88,7 @@ int main(int argc, char** argv)
             if (vm.count("fg"))             root.add("fg", vm["fg"].as<std::string>());
             if (vm.count("id"))             root.add("id", vm["id"].as<int>());
             if (vm.count("aot"))            root.add("aot", true);
+            if (vm.count("ac"))             root.add("ac", vm["ac"].as<std::string>());
             boost::property_tree::xml_parser::write_xml(out, tree);
         }
         io_service ios;
