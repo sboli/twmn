@@ -4,18 +4,15 @@ so no popup, just a notification slide.
 
 
 # twmnc
-    The command line client program. Sends notification requests to twmnd.
+    The command line client program. Sends notification requests to twmnd. Even though this
+    program is more powerful, you can still use notify-send to send your notifications.
     See twmnc --help for more infos.
-
-    --layout : This specifies a layout name. A specific configuration file next to twmn.conf which is
-		used for this layout. The layout take precedence over the twmn.conf and
-		twmnc parameters take precedence over the layout.
 
 # twmnd
     The daemon program. Listen no notification requests and show them one after another.
     This uses a config file which is usually located at /home/$USER/.config/twmn/twmn.conf
     and contains the following, INI format. You should give twmnd a first launch so
-    it can create the default configuration file.: 
+    it can create the default configuration file :
 
     # [gui]
     background_color : background color, HTML style [#000000 ; #FFFFFF] or svg style (blue, red, lightgray, etc ...)
@@ -38,5 +35,23 @@ so no popup, just a notification slide.
     duration : How long each notification remains visible.
     port     : The UDP port to use for notifications, 9797 is the default.
     sound_command : A command to play a sound with your favourite player. Leave it empty for no sound.
+    activate_command : A command to execute when the current notification is activated.
+    enable_shortcuts : Enable or disable shortcuts. true or false
+
+
+    # [shortcuts]
+    modifiers : One or Many modifiers (up to three) for twmnd. To use in combinaison with one of the key below
+                in order to trigger an action. Default : Alt
+
+    previous : (Not available yet) Combined with the modifiers, this key shows the previous notification. Mouse wheel up has the same effect.
+
+    next : (Not available yet) Combined with the modifiers, this key shows the next notification. Mouse wheel down has the same effect.
+
+    activate : Still combined with the modifiers, this key activate the notification.
+               It runs the command defined for activate_command.
+
+    hide : This key hide the notification.
+
+
 
 
