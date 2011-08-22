@@ -208,9 +208,15 @@ int Widget::computeWidth()
 void Widget::setupFont()
 {
     Message& m = m_messageQueue.front();
-    QFont font;
-    font.setPixelSize(m.data["fs"]->toInt());
-    font.setRawName(m.data["fn"]->toString());
+    QFont font("Sans");
+    QString name = m.data["fn"]->toString();
+    // Trick to detect a font in XFD format.
+    if (name.count('-') >= 4)
+        font.setRawName(name);
+    else {
+        font.setPixelSize(m.data["fs"]->toInt());
+        font.setFamily(name);
+    }
     QApplication::setFont(font);
 }
 

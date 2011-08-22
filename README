@@ -1,4 +1,4 @@
-Twmn is a notification system which is adapted to work with tiling window managers.
+Twmn is a notification system adapted to work with tiling window managers.
 The notifications are shown as a single line which is the usual size of the top/bottom bar,
 so no popup, just a notification slide.
 
