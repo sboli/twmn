@@ -1,5 +1,6 @@
 #include "widget.h"
 #include <exception>
+#include <iostream>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/shared_ptr.hpp>
