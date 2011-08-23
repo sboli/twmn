@@ -286,7 +286,10 @@ void Widget::setupTitle()
     boldFont.setBold(true);
     Message& m = m_messageQueue.front();
     if (m.data["title"]) {              // avoid ugly space if no icon is set
-        m_contentView["title"]->setText((m.data["icon"] ? " " : "") + m.data["title"]->toString() + " ");
+        QString text = (m.data["icon"] ? " " : "") + m.data["title"]->toString() + " ";
+        foreach (QString i, QStringList() << "\n" << "\r" << "<br/>" << "<br />")
+            text.replace(i, " ");
+        m_contentView["title"]->setText(text);
         m_contentView["title"]->setFont(boldFont);
         m_contentView["title"]->setMaximumWidth(9999);
     }
@@ -300,7 +303,10 @@ void Widget::setupContent()
 {
     Message& m = m_messageQueue.front();
     if (m.data["content"]) {
-        m_contentView["text"]->setText((m.data["icon"] && !m.data["title"] ? " " : "") + m.data["content"]->toString() + " ");
+        QString text = (m.data["icon"] && !m.data["title"] ? " " : "") + m.data["content"]->toString() + " ";
+        foreach (QString i, QStringList() << "\n" << "\r" << "<br/>" << "<br />")
+            text.replace(i, " ");
+        m_contentView["text"]->setText(text);
         m_contentView["text"]->setMaximumWidth(9999);
     }
     else {
