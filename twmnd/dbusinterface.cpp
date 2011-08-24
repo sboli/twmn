@@ -52,13 +52,9 @@ void DBusInterface::GetCapabilities(DBusMessage *msg)
     DBusMessage* reply;
     DBusMessageIter args;
     DBusMessageIter subargs;
-    int ncaps = 1;
-    char dummy[256];
 
-    const char *caps[1] = {"body"}, **ptr = caps;  // workaround (see specs)
+    const char *caps[1] = {"body"};
     serial++;
-
-    //printf("GetCapabilities called!\n");
 
     reply = dbus_message_new_method_return(msg);
     if(!reply) {

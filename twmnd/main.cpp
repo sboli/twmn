@@ -8,6 +8,8 @@
 void logOutput(QtMsgType type, const char *msg)
 {
 #ifdef QT_NO_DEBUG_OUTPUT
+    Q_UNUSED(type);
+    Q_UNUSED(msg);
     return;
 #else
     std::cout << "[" << QTime::currentTime().toString("hh:mm:ss").toStdString() << "]";
