@@ -3,7 +3,6 @@
 #include <iostream>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
-#include <boost/shared_ptr.hpp>
 #include <QApplication>
 #include <QFileInfo>
 #include <QDir>
@@ -20,7 +19,6 @@
 #include <QWheelEvent>
 #include "settings.h"
 #include "shortcutgrabber.h"
-#include "unistd.h"
 
 Widget::Widget() : m_shortcutGrabber(this, m_settings)
 {

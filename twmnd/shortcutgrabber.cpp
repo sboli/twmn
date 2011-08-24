@@ -5,9 +5,6 @@
 #include <X11/Xlib.h>
 #include <QTimer>
 
-#include <iomanip>
-#include <iostream>
-
 #include "widget.h"
 
 static int (*defaultXErrhandler)(Display* display, XErrorEvent* event);
