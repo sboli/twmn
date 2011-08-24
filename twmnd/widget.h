@@ -34,9 +34,9 @@ private slots:
 
 public slots:
     // Called from the ShortcutGrabber
-    void                    onPrevious();   ///< TODO
+    void                    onPrevious();
 
-    void                    onNext();       ///< TODO
+    void                    onNext();
 
     /*!
       * \brief Run a command when the user activate the notification
@@ -47,6 +47,11 @@ public slots:
       * \brief Hide the notification
       */
     void                    onHide();
+
+    /*!
+      * \brief Display the next notification as if the user invoqued onNext()
+      */
+    void                    autoNext();
 
     void                    mousePressEvent(QMouseEvent *);
 
@@ -107,6 +112,7 @@ private:
     DBusInterface           m_dbus;
     QTimer                  m_visible;
     ShortcutGrabber         m_shortcutGrabber;
+    QStack<Message>         m_previousStack;
 };
 
 #endif // WIDGET_H

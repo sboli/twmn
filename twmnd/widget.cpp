@@ -20,6 +20,7 @@
 #include <QWheelEvent>
 #include "settings.h"
 #include "shortcutgrabber.h"
+#include "unistd.h"
 
 Widget::Widget() : m_shortcutGrabber(this, m_settings)
 {
@@ -176,12 +177,16 @@ void Widget::reverseTrigger()
 
 void Widget::reverseStart()
 {
-    m_shortcutGrabber.disableShortcuts();
-    if (!m_messageQueue.isEmpty())
-        m_messageQueue.pop_front();
-    m_animation.setDirection(QAnimationGroup::Backward);
-    qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEasingCurve(QEasingCurve::InCubic);
-    m_animation.start();
+    if (m_messageQueue.size() <= 1) {
+        if (!m_messageQueue.isEmpty())
+            m_messageQueue.pop_front();
+        m_animation.setDirection(QAnimationGroup::Backward);
+        qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEasingCurve(QEasingCurve::InCubic);
+        m_animation.start();
+        m_shortcutGrabber.disableShortcuts();
+    }
+    else
+        autoNext();
 }
 
 int Widget::computeWidth()
@@ -422,24 +427,66 @@ void Widget::updateFinalWidth()
 
 void Widget::onPrevious()
 {
-    // TODO: After stacking
+    m_visible.start();
+    if (m_previousStack.size() < 1)
+        return;
+    Message m = m_previousStack.pop();
+    m_messageQueue.push_front(m);
+    loadDefaults();
+    setupFont();
+    setupColors();
+    setupIcon();
+    setupTitle();
+    setupContent();
+    updateFinalWidth();
 }
 
 void Widget::onNext()
 {
-    // TODO: After stacking
+    m_visible.start();
+    if (m_messageQueue.size() < 2)
+        return;
+    Message m = m_messageQueue.front();
+    m.data["manually_shown"] = boost::optional<QVariant>(true);
+    m_previousStack.push(m);
+    m_messageQueue.pop_front();
+    loadDefaults();
+    setupFont();
+    setupColors();
+    setupIcon();
+    setupTitle();
+    setupContent();
+    updateFinalWidth();
 }
 
 void Widget::onActivate()
 {
+    Q_ASSERT(!m_messageQueue.isEmpty());
     QProcess::startDetached(m_messageQueue.front().data["ac"]->toString());
     m_visible.start();
 }
 
 void Widget::onHide()
 {
+    m_messageQueue.clear();
     m_visible.setInterval(2);
     m_visible.start();
+}
+
+void Widget::autoNext()
+{
+    Message&m = m_messageQueue.front();
+    // The user already saw it manually.
+    if (m.data["manually_shown"]) {
+        m_messageQueue.pop_front();
+        reverseStart();
+    }
+    else {
+        QString soundCommand = m.data["sc"]->toString();
+        if (!soundCommand.isEmpty())
+            QProcess::startDetached(soundCommand);
+    }
+    onNext();
 }
 
 void Widget::mousePressEvent(QMouseEvent *e)
