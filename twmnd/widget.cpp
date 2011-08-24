@@ -133,35 +133,59 @@ void Widget::processMessageQueue()
 void Widget::updateTopLeftAnimation(QVariant value)
 {
     show();
-    setGeometry(0, 0, value.toInt(), height());
+    QPoint p(0, 0);
+    if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
+        QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
+        if (!tmp.isNull())
+            p = tmp;
+    }
+    setGeometry(p.y(), p.y(), value.toInt(), height());
     layout()->setSpacing(0);
 }
 
 void Widget::updateTopRightAnimation(QVariant value)
 {
     show();
-    int end = QDesktopWidget().availableGeometry(this).width();
-    int val = value.toInt();
-    setGeometry(end-val, 0, val, height());
+    const int end = QDesktopWidget().availableGeometry(this).width();
+    const int val = value.toInt();
+    QPoint p(end, 0);
+    if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
+        QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
+        if (!tmp.isNull())
+            p = tmp;
+    }
+    setGeometry(p.x()-val, p.y(), val, height());
     layout()->setSpacing(0);
 }
 
 void Widget::updateBottomRightAnimation(QVariant value)
 {
     show();
-    int wend = QDesktopWidget().availableGeometry(this).width();
-    int hend = QDesktopWidget().availableGeometry(this).height();
-    int val = value.toInt();
-    setGeometry(wend-val, hend-height(), val, height());
+    const int wend = QDesktopWidget().availableGeometry(this).width();
+    const int hend = QDesktopWidget().availableGeometry(this).height();
+    const int val = value.toInt();
+    QPoint p(wend, hend);
+    if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
+        QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
+        if (!tmp.isNull())
+            p = tmp;
+    }
+    setGeometry(p.x()-val, p.y()-height(), val, height());
     layout()->setSpacing(0);
 }
 
 void Widget::updateBottomLeftAnimation(QVariant value)
 {
     show();
-    int hend = QDesktopWidget().availableGeometry(this).height();
-    int val = value.toInt();
-    setGeometry(0, hend-height(), val, height());
+    const int hend = QDesktopWidget().availableGeometry(this).height();
+    const int val = value.toInt();
+    QPoint p(0, hend);
+    if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
+        QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
+        if (!tmp.isNull())
+            p = tmp;
+    }
+    setGeometry(p.x(), p.y()-height(), val, height());
     layout()->setSpacing(0);
 }
 
@@ -402,6 +426,19 @@ bool Widget::update(const Message &m)
         m_visible.start();
     }
     return found;
+}
+
+QPoint Widget::stringToPos(QString string)
+{
+    string.replace("X", "x");
+    string.replace("*", "x");
+    const QStringList splitted = string.split("x");
+    if (string.isEmpty() || !string.contains('x') || splitted.size() < 2)
+        return QPoint();
+    QPoint ret;
+    ret.setX(QString(splitted[0]).toInt());
+    ret.setY(QString(splitted[1]).toInt());
+    return ret;
 }
 
 void Widget::updateFinalWidth()

@@ -10,6 +10,7 @@ Settings::Settings(QString file) : m_file(file)
     m_defaultSettings["main/duration"] = "3000";
     m_defaultSettings["main/enable_shortcuts"] = true;
     m_defaultSettings["gui/position"] = "top_right";
+    m_defaultSettings["gui/absolute_position"] = "";
     m_defaultSettings["gui/height"] = 18;
     m_defaultSettings["gui/font"] = "Sans";
     m_defaultSettings["gui/font_size"] = 13;
