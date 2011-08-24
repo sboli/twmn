@@ -19,7 +19,10 @@ const int   DEFAULT_PORT = 9797;
   */
 bool read_port(int& port)
 {
-    std::string path = getenv("XDG_CONFIG_HOME");
+    const char* xdgDir = getenv("XDG_CONFIG_HOME");
+    if (!xdgDir)
+        return false;
+    std::string path = xdgDir ;
     path += "/twmn/twmn.conf";
     std::ifstream in(path.c_str());
     if (!in)
@@ -93,9 +96,10 @@ int main(int argc, char** argv)
         }
         io_service ios;
         ip::udp::socket s(ios, ip::udp::endpoint(ip::udp::v4(), 0));
-        int port = vm.count("port") ? vm["port"].as<int>() : DEFAULT_PORT;
-        if (!vm.count("port"))
-            read_port(port);
+        int port = vm.count("port") ? vm["port"].as<int>() : 0;
+        if (!port)
+            if (!read_port(port))
+                port = DEFAULT_PORT;
         s.send_to(buffer(out.str()), ip::udp::endpoint(ip::address(ip::address_v4::from_string(vm["host"].as<std::string>())), port));
         ios.run();
     }
