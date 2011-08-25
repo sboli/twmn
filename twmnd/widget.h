@@ -103,6 +103,8 @@ private:
       */
     bool                    update(const Message& m);
 
+    QPoint                  stringToPos(QString string);
+
 private:
     Settings                m_settings;
     QUdpSocket              m_socket;
