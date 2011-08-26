@@ -1,12 +1,12 @@
 twmn
 ====
-A notification system adapted to work with tiling window managers.
+A notification system adapted to work with tiling window managers. `twmn` is 2 different tools:
 
-Notifications are shown in a one-line bar called the notification slide.
-
-`twmnc` is a command line tool to send notification requests to `twmnd`. Even though twmnc is more powerful, you can still use notify-send to send your notifications. See twmnc --help for more information.
+`twmnc` is a command line tool to send notification requests to `twmnd`. You can also use `notify-send` for a similar purpose, even though `twmnc` is more powerful. See `twmnc --help` for more information.
 
 `twmnd` is the daemon listening to notification requests and showing them one after another.
+
+Notifications are shown in a one-line bar called the notification slide. They can be navigated through and activated with shortcuts. See `twmn.conf`.
 
 Configuration is done in the INI format in `twmn.conf`, which is usually located at `~/.config/twmn/twmn.conf`. A default configuration is created when `twmnd` is launched for the first time.
 
@@ -17,8 +17,8 @@ About twmn.conf
 [gui]
 ; Absolute position from the top-left corner of the slide. You may need it
 ; for a multi-screen setup. You still have to set position in order to choose
-; the slide animation. If this value is empty, twmd will try to figure out where
-; to display the slide according to your desktop size and the position value.
+; the slide animation. If empty, twmnd will try to figure out where to display
+; the slide according to your desktop size and the position value.
 absolute_position=  ; Supported format: WxH. Width and Height being integers.
 
 ; Background color.
@@ -57,7 +57,7 @@ activate_command=  ; Path to command.
 duration=3000  ; In millisecond.
 
 ; Enable or disable shortcuts.
-enable_shortcuts=  ; true or false.
+enable_shortcuts=true  ; true or false.
 
 ; UDP port used for notifications.
 port=9797
@@ -74,7 +74,7 @@ modifiers=Alt+  ; Up to three modifiers. Use with the following shortcuts.
 previous=K
 
 ; Shows the next notification. If a modification is manually shown it will not
-; be displayed again ; when twmnd process the notification stack. Mouse wheel up
+; be displayed again when twmnd process the notification stack. Mouse wheel up
 ; does it too.
 next=J
 
@@ -83,6 +83,6 @@ next=J
 activate=Return
 
 ; Hides all notifications. To hide the current notification, use the "next" key
-; instead. Mouse Right click has the same effect.
+; instead. Mouse right click has the same effect.
 hide=X
 </pre>
