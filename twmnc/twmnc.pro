@@ -9,6 +9,7 @@ DEPENDPATH += .
 INCLUDEPATH += .
 DESTDIR = ../bin/
 LIBS += -lboost_program_options -lboost_system
-
+target.path += /usr/local/bin
+INSTALLS += target
 # Input
 SOURCES += main.cpp

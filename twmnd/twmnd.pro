@@ -12,6 +12,10 @@ CONFIG += release
 DESTDIR = ../bin/
 LIBS += `pkg-config --libs-only-l dbus-1`
 QMAKE_CXXFLAGS += `pkg-config --cflags-only-I dbus-1`
+
+target.path+=/usr/local/bin
+INSTALLS += target
+
 SOURCES += main.cpp\
         widget.cpp \
     settings.cpp \
