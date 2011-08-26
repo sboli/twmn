@@ -1,12 +1,14 @@
 twmn
 ====
-A notification system adapted to work with tiling window managers. `twmn` is 2 different tools:
+A notification system for tiling window managers. `twmn` is two things:
 
-`twmnc` is a command line tool to send notification requests to `twmnd`. You can also use `notify-send` for a similar purpose, even though `twmnc` is more powerful. See `twmnc --help` for more information.
+`twmnc`: command line tool to send notifications to `twmnd`. You can also use `notify-send` for a similar purpose, but `twmnc` is more powerful. See `twmnc --help` for more information.
 
-`twmnd` is the daemon listening to notification requests and showing them one after another. Its configuration is done in the INI format at `~/.config/twmn/twmn.conf`. The file is created with a default configuration when `twmnd` is launched for the first time.
+`twmnd`: daemon listening to notification requests and showing them one after another. Configure it at `~/.config/twmn/twmn.conf`. The file is generated the first time `twmnd` is launched.
 
-Notifications are shown in a one-line bar called the notification slide. They can be navigated through and activated with shortcuts. See `twmn.conf`.
+Notifications are shown in a one-line bar called the notification slide. They can be navigated through and activated with shortcuts.
+
+See `twmn.conf` for more information.
 
 
 About twmn.conf
@@ -14,8 +16,8 @@ About twmn.conf
 <pre>
 [gui]
 ; Absolute position from the top-left corner of the slide. You may need it for a multi-screen setup.
-; You still have to set position in order to choose ; the slide animation. If empty, twmnd will try
-; to figure out where to display the slide according to your desktop size and the position value.
+; You still have to set position in order to choose the slide animation. If empty, twmnd will try
+; to figure out where to display the slide according to your desktop size and the slide position.
 absolute_position=  ; Supported format: WxH. Width and Height being integers.
 
 ; Background color.
