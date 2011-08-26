@@ -320,6 +320,7 @@ void Widget::connectForPosition(QString position)
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopLeftAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomRightAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomLeftAnimation(QVariant)));
+    disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopCenterAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomCenterAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateCenterAnimation(QVariant)));
     anim->setDuration(1000);
@@ -483,6 +484,7 @@ bool Widget::update(const Message &m)
         setupTitle();
         setupContent();
         updateFinalWidth();
+        connectForPosition(m_messageQueue.front().data["pos"]->toString());
         m_visible.start();
     }
     return found;
