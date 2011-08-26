@@ -13,10 +13,9 @@ About twmn.conf
 ---------------
 <pre>
 [gui]
-; Absolute position from the top-left corner of the slide. You may need it
-; for a multi-screen setup. You still have to set position in order to choose
-; the slide animation. If empty, twmnd will try to figure out where to display
-; the slide according to your desktop size and the position value.
+; Absolute position from the top-left corner of the slide. You may need it for a multi-screen setup.
+; You still have to set position in order to choose ; the slide animation. If empty, twmnd will try
+; to figure out where to display the slide according to your desktop size and the position value.
 absolute_position=  ; Supported format: WxH. Width and Height being integers.
 
 ; Background color.
@@ -71,9 +70,8 @@ modifiers=Alt+  ; Up to three modifiers. Use with the following shortcuts.
 ; Shows the previous notification. Mouse wheel up does it too.
 previous=K
 
-; Shows the next notification. If a modification is manually shown it will not
-; be displayed again when twmnd process the notification stack. Mouse wheel up
-; does it too.
+; Shows the next notification. If a modification is manually shown it will not be displayed again
+; when twmnd process the notification stack. Mouse wheel up does it too.
 next=J
 
 ; Activates the notification. Runs the command defined at activate_command.
