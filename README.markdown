@@ -40,8 +40,8 @@ foreground_color=white  ; RBG hex and keywords (eg. lightgray) are supported.
 height=18  ; In pixel.
 
 ; Position of the notification slide.
-position=top_right  ; Accepted values: top_right, top_left, bottom_right,
-                    ; bottom_left, top_center, bottom_center, center.
+position=top_right  ; Accepted values: top_right (tr), top_left (tl), bottom_right (br),
+                    ; bottom_left (bl), top_center (tc), bottom_center (bc), center (c).
 
 
 [icons]
