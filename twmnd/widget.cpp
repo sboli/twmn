@@ -23,7 +23,7 @@
 Widget::Widget() : m_shortcutGrabber(this, m_settings)
 {
     setWindowFlags(Qt::ToolTip);
-    QPropertyAnimation* anim = new QPropertyAnimation;
+    QPropertyAnimation* anim = new QPropertyAnimation(this);
     anim->setTargetObject(this);
     m_animation.addAnimation(anim);
     anim->setEasingCurve(QEasingCurve::OutBounce);
@@ -338,11 +338,11 @@ void Widget::connectForPosition(QString position)
     else if (position == "top_center") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopCenterAnimation(QVariant)));
     }
-    else if (position == "top_bottom") {
+    else if (position == "bottom_center") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomCenterAnimation(QVariant)));
     }
     else if (position == "center") {
-        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomCenterAnimation(QVariant)));
+        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateCenterAnimation(QVariant)));
     }
 }
 
@@ -508,18 +508,20 @@ void Widget::updateFinalWidth()
     QString position = m_messageQueue.front().data["pos"]->toString();
     int width = computeWidth();
     qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEndValue(width);
-    if (position == "top_left") {
+    if (position == "top_left")
         updateTopLeftAnimation(width);
-    }
-    else if (position == "top_right") {
+    else if (position == "top_right")
         updateTopRightAnimation(width);
-    }
-    else if (position == "bottom_right") {
+    else if (position == "bottom_right")
         updateBottomRightAnimation(width);
-    }
-    else if (position == "bottom_left") {
+    else if (position == "bottom_left")
         updateBottomLeftAnimation(width);
-    }
+    else if (position == "top_center")
+        updateTopCenterAnimation(width);
+    else if (position == "bottom_center")
+        updateBottomCenterAnimation(width);
+    else if (position == "center")
+        updateCenterAnimation(width);
 }
 
 void Widget::onPrevious()
