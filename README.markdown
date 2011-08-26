@@ -92,10 +92,11 @@ For [Arch Linux](http://www.archlinux.org/) users, `twmn` is [on the AUR](https:
 Otherwise you can install `twmnd` and `twmnc` manually:
 
 1. install `boost`, `qt` and `dbus` if they weren't before
-1. `cd path/to/twmn`
-2. `qmake` to generate a Makefile
-3. `make` to compile
-4. `sudo make install` will copy `twmnd` and `twmnc` under /usr/local/bin, make sure this folder is in your `$PATH` environment variable. (`export PATH=$PATH:/usr/local/bin`)
-5. add `twmnd` where it will be executed each time you login (ie. in your `.xinitrc`, `rc.conf`, etc)
+2. `git clone https://github.com/sboli/twmn.git` to get `twmn`
+3. `cd twmn/`
+4. `qmake` to generate a Makefile
+5. `make` to compile
+6. `sudo make install` to install `twmnd` and `twmnc` in `/usr/local/bin`. Make sure this folder is in your `$PATH` environment variable. (`export PATH=$PATH:/usr/local/bin`)
+7. for `twmnd` to be always running, add it to your `.xinitrc`, `rc.conf` or else
 
 The `storage_notifier` example requires `dbus-python` to be installed. The `mpd_notifier` example requires `python-mpd` to be installed and running.
