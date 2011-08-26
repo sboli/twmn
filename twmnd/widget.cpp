@@ -328,28 +328,32 @@ void Widget::connectForPosition(QString position)
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomCenterAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateCenterAnimation(QVariant)));
     anim->setDuration(1000);
-    if (position == "top_left") {
+    if (position == "top_left" || position == "tl") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopLeftAnimation(QVariant)));
     }
-    else if (position == "top_right") {
+    else if (position == "top_right" || position == "tr") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopRightAnimation(QVariant)));
     }
-    else if (position == "bottom_right") {
+    else if (position == "bottom_right" || position == "br") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomRightAnimation(QVariant)));
     }
-    else if (position == "bottom_left") {
+    else if (position == "bottom_left" || position == "bl") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomLeftAnimation(QVariant)));
     }
-    else if (position == "top_center") {
+    else if (position == "top_center" || position == "tc") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopCenterAnimation(QVariant)));
     }
-    else if (position == "bottom_center") {
+    else if (position == "bottom_center" || position == "bc") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomCenterAnimation(QVariant)));
     }
-    else if (position == "center") {
+    else if (position == "center" || position == "c") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateCenterAnimation(QVariant)));
     }
-    qDebug() << position;
+    else {
+        // top_right seems to be the classic case so fallback to it.
+        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopRightAnimation(QVariant)));
+        qDebug() << "default position";
+    }
 }
 
 void Widget::setupIcon()
@@ -515,19 +519,19 @@ void Widget::updateFinalWidth()
     QString position = m_messageQueue.front().data["pos"]->toString();
     int width = computeWidth();
     qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEndValue(width);
-    if (position == "top_left")
+    if (position == "top_left" || position == "tl")
         updateTopLeftAnimation(width);
-    else if (position == "top_right")
+    else if (position == "top_right" || position == "tr")
         updateTopRightAnimation(width);
-    else if (position == "bottom_right")
+    else if (position == "bottom_right" || position == "br")
         updateBottomRightAnimation(width);
-    else if (position == "bottom_left")
+    else if (position == "bottom_left" || position == "bl")
         updateBottomLeftAnimation(width);
-    else if (position == "top_center")
+    else if (position == "top_center" || position == "tc")
         updateTopCenterAnimation(width);
-    else if (position == "bottom_center")
+    else if (position == "bottom_center" || position == "bc")
         updateBottomCenterAnimation(width);
-    else if (position == "center")
+    else if (position == "center" || position == "c")
         updateCenterAnimation(width);
 }
 
@@ -544,8 +548,8 @@ void Widget::onPrevious()
     setupIcon();
     setupTitle();
     setupContent();
-    updateFinalWidth();
     connectForPosition(m_messageQueue.front().data["pos"]->toString());
+    updateFinalWidth();
 }
 
 void Widget::onNext()
@@ -563,8 +567,8 @@ void Widget::onNext()
     setupIcon();
     setupTitle();
     setupContent();
-    updateFinalWidth();
     connectForPosition(m_messageQueue.front().data["pos"]->toString());
+    updateFinalWidth();
 }
 
 void Widget::onActivate()
