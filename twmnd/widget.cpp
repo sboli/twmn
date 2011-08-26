@@ -221,7 +221,20 @@ void Widget::updateBottomCenterAnimation(QVariant value)
 
 void Widget::updateCenterAnimation(QVariant value)
 {
-
+    const int finalWidth = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->endValue().toInt();
+    const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
+    const int h = value.toInt() * finalHeight / finalWidth;
+    const int wend = QDesktopWidget().availableGeometry(this).width();
+    const int hend = QDesktopWidget().availableGeometry(this).height();
+    QPoint p(wend, hend);
+    if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
+        QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
+        if (!tmp.isNull())
+            p = tmp;
+    }
+    show();
+    layout()->setSpacing(0);
+    setGeometry(p.x()/2 - value.toInt()/2, p.y()/2 - h/2, value.toInt(), h);
 }
 
 void Widget::reverseTrigger()
