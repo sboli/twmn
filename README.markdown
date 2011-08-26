@@ -4,11 +4,9 @@ A notification system adapted to work with tiling window managers. `twmn` is 2 d
 
 `twmnc` is a command line tool to send notification requests to `twmnd`. You can also use `notify-send` for a similar purpose, even though `twmnc` is more powerful. See `twmnc --help` for more information.
 
-`twmnd` is the daemon listening to notification requests and showing them one after another.
+`twmnd` is the daemon listening to notification requests and showing them one after another. Its configuration is done in the INI format at `~/.config/twmn/twmn.conf`. The file is created with a default configuration when `twmnd` is launched for the first time.
 
 Notifications are shown in a one-line bar called the notification slide. They can be navigated through and activated with shortcuts. See `twmn.conf`.
-
-Configuration is done in the INI format in `twmn.conf`, which is usually located at `~/.config/twmn/twmn.conf`. A default configuration is created when `twmnd` is launched for the first time.
 
 
 About twmn.conf
