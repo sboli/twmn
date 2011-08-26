@@ -127,13 +127,14 @@ void Widget::processMessageQueue()
 
 void Widget::updateTopLeftAnimation(QVariant value)
 {
+    const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
     QPoint p(0, 0);
     if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
         if (!tmp.isNull())
             p = tmp;
     }
-    setGeometry(p.y(), p.y(), value.toInt(), height());
+    setGeometry(p.y(), p.y(), value.toInt(), finalHeight);
     layout()->setSpacing(0);
     show();
 }
@@ -142,13 +143,14 @@ void Widget::updateTopRightAnimation(QVariant value)
 {
     const int end = QDesktopWidget().availableGeometry(this).width();
     const int val = value.toInt();
+    const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
     QPoint p(end, 0);
     if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
         if (!tmp.isNull())
             p = tmp;
     }
-    setGeometry(p.x()-val, p.y(), val, m_messageQueue.front().data["size"]->toInt());
+    setGeometry(p.x()-val, p.y(), val, finalHeight);
     layout()->setSpacing(0);
     show();
 }
@@ -157,6 +159,7 @@ void Widget::updateBottomRightAnimation(QVariant value)
 {
     const int wend = QDesktopWidget().availableGeometry(this).width();
     const int hend = QDesktopWidget().availableGeometry(this).height();
+    const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
     const int val = value.toInt();
     QPoint p(wend, hend);
     if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
@@ -164,7 +167,7 @@ void Widget::updateBottomRightAnimation(QVariant value)
         if (!tmp.isNull())
             p = tmp;
     }
-    setGeometry(p.x()-val, p.y()-height(), val, m_messageQueue.front().data["size"]->toInt());
+    setGeometry(p.x()-val, p.y()-height(), val, finalHeight);
     layout()->setSpacing(0);
     show();
 }
@@ -172,6 +175,7 @@ void Widget::updateBottomRightAnimation(QVariant value)
 void Widget::updateBottomLeftAnimation(QVariant value)
 {
     const int hend = QDesktopWidget().availableGeometry(this).height();
+    const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
     const int val = value.toInt();
     QPoint p(0, hend);
     if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
@@ -179,7 +183,7 @@ void Widget::updateBottomLeftAnimation(QVariant value)
         if (!tmp.isNull())
             p = tmp;
     }
-    setGeometry(p.x(), p.y()-height(), val, m_messageQueue.front().data["size"]->toInt());
+    setGeometry(p.x(), p.y()-height(), val, finalHeight);
     layout()->setSpacing(0);
     show();
 }
@@ -317,7 +321,7 @@ void Widget::connectForPosition(QString position)
     if (!anim)
         return;
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopLeftAnimation(QVariant)));
-    disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopLeftAnimation(QVariant)));
+    disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopRightAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomRightAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomLeftAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopCenterAnimation(QVariant)));
@@ -345,6 +349,7 @@ void Widget::connectForPosition(QString position)
     else if (position == "center") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateCenterAnimation(QVariant)));
     }
+    qDebug() << position;
 }
 
 void Widget::setupIcon()
@@ -540,6 +545,7 @@ void Widget::onPrevious()
     setupTitle();
     setupContent();
     updateFinalWidth();
+    connectForPosition(m_messageQueue.front().data["pos"]->toString());
 }
 
 void Widget::onNext()
@@ -558,6 +564,7 @@ void Widget::onNext()
     setupTitle();
     setupContent();
     updateFinalWidth();
+    connectForPosition(m_messageQueue.front().data["pos"]->toString());
 }
 
 void Widget::onActivate()
