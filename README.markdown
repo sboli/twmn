@@ -6,14 +6,13 @@ Notifications are shown in a one-line bar called the notification slide.
 
 `twmnc` is a command line tool to send notification requests to `twmnd`. Even though twmnc is more powerful, you can still use notify-send to send your notifications. See twmnc --help for more information.
 
-
 `twmnd` is the daemon listening to notification requests and showing them one after another.
 
-Configuration is done in an INI config file usually located at ~/.config/twmn/twmn.conf. The file will be created at first launch.
+Configuration is done in the INI format in `twmn.conf`, which is usually located at `~/.config/twmn/twmn.conf`. A default configuration is created when `twmnd` is launched for the first time.
 
 
-Default twmn.conf explained
----------------------------
+About twmn.conf
+---------------
 <pre>
 [gui]
 ; Absolute position from the top-left corner of the slide. You may need it
@@ -23,7 +22,7 @@ Default twmn.conf explained
 absolute_position=  ; Supported format: WxH. Width and Height being integers.
 
 ; Background color.
-background_color=black  ; CSS-like keywords and RBG hex are supported (eg. lightgray).
+background_color=black  ; RBG hex and keywords (eg. lightgray) are supported.
 
 ; An icon for the layout. Useful only for a layout file.
 icon=  ; Path to image file. Optional.
@@ -35,7 +34,7 @@ font=Sans
 font_size=13  ; In pixel.
 
 ; Text color.
-foreground_color=white  ; CSS-like keywords and RBG hex are supported (eg. lightgray).
+foreground_color=white  ; RBG hex and keywords (eg. lightgray) are supported.
 
 ; Height of the slide bar. Useful to match your tiling window manager's bar.
 height=18  ; In pixel.
@@ -51,7 +50,7 @@ NAME_icon=  ; Path to image file. NAME being the icon's custom name.
 
 
 [main]
-; Program/command executed on current notification activation.
+; Program/command to be executed on notification activation.
 activate_command=  ; Path to command.
 
 ; Time each notification remains visible.
@@ -74,15 +73,16 @@ modifiers=Alt+  ; Up to three modifiers. Use with the following shortcuts.
 ; Shows the previous notification. Mouse wheel up does it too.
 previous=K
 
-; Shows the next notification.  If a modification is manually shown it will ne be displayed again
-; when twmnd process the notification stack. Mouse wheel up does it too.
+; Shows the next notification. If a modification is manually shown it will not
+; be displayed again ; when twmnd process the notification stack. Mouse wheel up
+; does it too.
 next=J
 
 ; Activates the notification. Runs the command defined at activate_command.
 ; Mouse left click activates it too.
 activate=Return
 
-; Hides all notifications. To hide the current notification, use the "next" key instead.
-; Mouse Right click has the same effect.
+; Hides all notifications. To hide the current notification, use the "next" key
+; instead. Mouse Right click has the same effect.
 hide=X
 </pre>
