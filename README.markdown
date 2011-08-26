@@ -84,3 +84,20 @@ activate=Return
 ; instead. Mouse right click has the same effect.
 hide=X
 </pre>
+
+
+Installation
+------------
+
+For [Arch Linux](http://www.archlinux.org/) users, `twmn` is [on the AUR](https://aur.archlinux.org/packages.php?ID=51596).
+
+Quick and dirty `twmnd` and `twmnc` installation:
+
+1. install `boost`, `qt` and `dbus` if they weren't before
+1. `cd path/to/twmn`
+2. `qmake` to generate a Makefile
+3. `make` to compile
+4. add `export PATH=$PATH:/path/to/twmn/bin` to your bashrc or similar to be able to run `twmnd` and `twmnc`
+5. add `twmnd` where it will be executed each time you login (ie. in your `.xinitrc`, `rc.conf`, etc)
+
+The `storage_notifier` example requires `dbus-python` to be installed. The `mpd_notifier` example requires `mpd` to be installed and running.
