@@ -68,8 +68,7 @@ sound_command=  ;  Path to command. Leave empty for no sound.
 ; Modifiers shortcuts.
 modifiers=Alt+  ; Up to three modifiers. Use with the following shortcuts.
 
-; Shows the previous notification. Mouse wheel up does it too.
-previous=K
+; Shows the previous notification. Mouse wheel up does it too.previous=K
 
 ; Shows the next notification. If a modification is manually shown it will not
 ; be displayed again when twmnd process the notification stack. Mouse wheel up
@@ -91,13 +90,14 @@ Installation
 
 For [Arch Linux](http://www.archlinux.org/) users, `twmn` is [on the AUR](https://aur.archlinux.org/packages.php?ID=51596).
 
-Quick and dirty `twmnd` and `twmnc` installation:
+Otherwise you can install `twmnd` and `twmnc` manually:
 
 1. install `boost`, `qt` and `dbus` if they weren't before
 1. `cd path/to/twmn`
 2. `qmake` to generate a Makefile
 3. `make` to compile
-4. add `export PATH=$PATH:/path/to/twmn/bin` to your bashrc or similar to be able to run `twmnd` and `twmnc`
+4. `sudo make install` will copy `twmnd` and `twmnc` under /usr/local/bin, make sure this folder is in your 
+`$PATH` environment variable. (export PATH="$PATH:/usr/local/bin")
 5. add `twmnd` where it will be executed each time you login (ie. in your `.xinitrc`, `rc.conf`, etc)
 
-The `storage_notifier` example requires `dbus-python` to be installed. The `mpd_notifier` example requires `mpd` to be installed and running.
+The `storage_notifier` example requires `dbus-python` to be installed. The `mpd_notifier` example requires `python-mpd` to be installed and running.
