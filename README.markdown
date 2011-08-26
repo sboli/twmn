@@ -98,7 +98,6 @@ Quick and dirty `twmnd` and `twmnc` installation:
 2. `qmake` to generate a Makefile
 3. `make` to compile
 4. add `export PATH=$PATH:/path/to/twmn/bin` to your bashrc or similar to be able to run `twmnd` and `twmnc`
-5. add `twmnd` it will be executed each time you login (ie. in your `.xinitrc`, `rc.conf`, etc)
+5. add `twmnd` where it will be executed each time you login (ie. in your `.xinitrc`, `rc.conf`, etc)
 
-The `storage_notifier` example requires `dbus-python` to be installed.
-The `mpd_notifier` example requires `mpd`.
+The `storage_notifier` example requires `dbus-python` to be installed. The `mpd_notifier` example requires `mpd` to be installed and running.
