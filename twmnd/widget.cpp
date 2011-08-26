@@ -127,7 +127,6 @@ void Widget::processMessageQueue()
 
 void Widget::updateTopLeftAnimation(QVariant value)
 {
-    show();
     QPoint p(0, 0);
     if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
@@ -136,11 +135,11 @@ void Widget::updateTopLeftAnimation(QVariant value)
     }
     setGeometry(p.y(), p.y(), value.toInt(), height());
     layout()->setSpacing(0);
+    show();
 }
 
 void Widget::updateTopRightAnimation(QVariant value)
 {
-    show();
     const int end = QDesktopWidget().availableGeometry(this).width();
     const int val = value.toInt();
     QPoint p(end, 0);
@@ -151,11 +150,11 @@ void Widget::updateTopRightAnimation(QVariant value)
     }
     setGeometry(p.x()-val, p.y(), val, m_messageQueue.front().data["size"]->toInt());
     layout()->setSpacing(0);
+    show();
 }
 
 void Widget::updateBottomRightAnimation(QVariant value)
 {
-    show();
     const int wend = QDesktopWidget().availableGeometry(this).width();
     const int hend = QDesktopWidget().availableGeometry(this).height();
     const int val = value.toInt();
@@ -167,11 +166,11 @@ void Widget::updateBottomRightAnimation(QVariant value)
     }
     setGeometry(p.x()-val, p.y()-height(), val, m_messageQueue.front().data["size"]->toInt());
     layout()->setSpacing(0);
+    show();
 }
 
 void Widget::updateBottomLeftAnimation(QVariant value)
 {
-    show();
     const int hend = QDesktopWidget().availableGeometry(this).height();
     const int val = value.toInt();
     QPoint p(0, hend);
@@ -182,6 +181,7 @@ void Widget::updateBottomLeftAnimation(QVariant value)
     }
     setGeometry(p.x(), p.y()-height(), val, m_messageQueue.front().data["size"]->toInt());
     layout()->setSpacing(0);
+    show();
 }
 
 void Widget::updateTopCenterAnimation(QVariant value)
@@ -196,9 +196,9 @@ void Widget::updateTopCenterAnimation(QVariant value)
         if (!tmp.isNull())
             p = tmp;
     }
-    show();
-    layout()->setSpacing(0);
     setGeometry(p.x()/2 - finalWidth/2, p.y(), finalWidth, h);
+    layout()->setSpacing(0);
+    show();
 }
 
 void Widget::updateBottomCenterAnimation(QVariant value)
@@ -214,9 +214,9 @@ void Widget::updateBottomCenterAnimation(QVariant value)
         if (!tmp.isNull())
             p = tmp;
     }
-    show();
-    layout()->setSpacing(0);
     setGeometry(p.x()/2 - finalWidth/2, p.y()-h, finalWidth, h);
+    layout()->setSpacing(0);
+    show();
 }
 
 void Widget::updateCenterAnimation(QVariant value)
@@ -232,9 +232,9 @@ void Widget::updateCenterAnimation(QVariant value)
         if (!tmp.isNull())
             p = tmp;
     }
-    show();
-    layout()->setSpacing(0);
     setGeometry(p.x()/2 - value.toInt()/2, p.y()/2 - h/2, value.toInt(), h);
+    layout()->setSpacing(0);
+    show();
 }
 
 void Widget::reverseTrigger()
