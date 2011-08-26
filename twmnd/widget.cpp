@@ -187,11 +187,10 @@ void Widget::updateBottomLeftAnimation(QVariant value)
 void Widget::updateTopCenterAnimation(QVariant value)
 {
     const int finalWidth = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->endValue().toInt();
-    const int h = value.toInt() *
-                  (m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height() )
-                  / finalWidth;
+    const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
+    const int h = value.toInt() * finalHeight / finalWidth;
     const int wend = QDesktopWidget().availableGeometry(this).width();
-    QPoint p(wend/2 - finalWidth/2, 0);
+    QPoint p(wend, 0);
     if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
         if (!tmp.isNull())
@@ -199,7 +198,30 @@ void Widget::updateTopCenterAnimation(QVariant value)
     }
     show();
     layout()->setSpacing(0);
-    setGeometry(p.x(), p.y(), finalWidth, h);
+    setGeometry(p.x()/2 - finalWidth/2, p.y(), finalWidth, h);
+}
+
+void Widget::updateBottomCenterAnimation(QVariant value)
+{
+    const int finalWidth = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->endValue().toInt();
+    const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
+    const int h = value.toInt() * finalHeight / finalWidth;
+    const int wend = QDesktopWidget().availableGeometry(this).width();
+    const int hend = QDesktopWidget().availableGeometry(this).height();
+    QPoint p(wend, hend);
+    if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
+        QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
+        if (!tmp.isNull())
+            p = tmp;
+    }
+    show();
+    layout()->setSpacing(0);
+    setGeometry(p.x()/2 - finalWidth/2, p.y()-h, finalWidth, h);
+}
+
+void Widget::updateCenterAnimation(QVariant value)
+{
+
 }
 
 void Widget::reverseTrigger()
@@ -300,7 +322,12 @@ void Widget::connectForPosition(QString position)
     }
     else if (position == "top_center") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopCenterAnimation(QVariant)));
-        anim->setDuration(1000);
+    }
+    else if (position == "top_bottom") {
+        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomCenterAnimation(QVariant)));
+    }
+    else if (position == "center") {
+        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateCenterAnimation(QVariant)));
     }
 }
 

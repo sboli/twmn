@@ -28,6 +28,8 @@ private slots:
     void                    updateBottomRightAnimation(QVariant value);
     void                    updateBottomLeftAnimation(QVariant value);
     void                    updateTopCenterAnimation(QVariant value);
+    void                    updateBottomCenterAnimation(QVariant value);
+    void                    updateCenterAnimation(QVariant value);
     void                    reverseTrigger();
     void                    reverseStart();
 
