@@ -22,10 +22,12 @@ private slots:
     void                    onDataReceived();
     void                    appendMessageToQueue(const Message& msg);
     void                    processMessageQueue();
+
     void                    updateTopLeftAnimation(QVariant value);
     void                    updateTopRightAnimation(QVariant value);
     void                    updateBottomRightAnimation(QVariant value);
     void                    updateBottomLeftAnimation(QVariant value);
+    void                    updateTopCenterAnimation(QVariant value);
     void                    reverseTrigger();
     void                    reverseStart();
 

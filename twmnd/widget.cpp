@@ -27,10 +27,8 @@ Widget::Widget() : m_shortcutGrabber(this, m_settings)
     anim->setTargetObject(this);
     m_animation.addAnimation(anim);
     anim->setEasingCurve(QEasingCurve::OutBounce);
-    anim->setDuration(1000);
     connect(anim, SIGNAL(finished()), this, SLOT(reverseTrigger()));
     connectForPosition(m_settings.get("gui/position").toString());
-    setFixedHeight(m_settings.get("gui/height").toInt());
     connect(&m_dbus, SIGNAL(messageReceived(Message)), this, SLOT(appendMessageToQueue(Message)));
     connect(&m_visible, SIGNAL(timeout()), this, SLOT(reverseStart()));
     m_visible.setSingleShot(true);
@@ -107,7 +105,6 @@ void Widget::processMessageQueue()
     boldFont.setBold(true);
     Message& m = m_messageQueue.front();
     loadDefaults();
-    setFixedHeight(m.data["size"]->toInt());
     if (m.data["aot"]->toBool())
         raise();
     setupFont();
@@ -152,7 +149,7 @@ void Widget::updateTopRightAnimation(QVariant value)
         if (!tmp.isNull())
             p = tmp;
     }
-    setGeometry(p.x()-val, p.y(), val, height());
+    setGeometry(p.x()-val, p.y(), val, m_messageQueue.front().data["size"]->toInt());
     layout()->setSpacing(0);
 }
 
@@ -168,7 +165,7 @@ void Widget::updateBottomRightAnimation(QVariant value)
         if (!tmp.isNull())
             p = tmp;
     }
-    setGeometry(p.x()-val, p.y()-height(), val, height());
+    setGeometry(p.x()-val, p.y()-height(), val, m_messageQueue.front().data["size"]->toInt());
     layout()->setSpacing(0);
 }
 
@@ -183,8 +180,26 @@ void Widget::updateBottomLeftAnimation(QVariant value)
         if (!tmp.isNull())
             p = tmp;
     }
-    setGeometry(p.x(), p.y()-height(), val, height());
+    setGeometry(p.x(), p.y()-height(), val, m_messageQueue.front().data["size"]->toInt());
     layout()->setSpacing(0);
+}
+
+void Widget::updateTopCenterAnimation(QVariant value)
+{
+    const int finalWidth = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->endValue().toInt();
+    const int h = value.toInt() *
+                  (m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height() )
+                  / finalWidth;
+    const int wend = QDesktopWidget().availableGeometry(this).width();
+    QPoint p(wend/2 - finalWidth/2, 0);
+    if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
+        QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
+        if (!tmp.isNull())
+            p = tmp;
+    }
+    show();
+    layout()->setSpacing(0);
+    setGeometry(p.x(), p.y(), finalWidth, h);
 }
 
 void Widget::reverseTrigger()
@@ -270,6 +285,7 @@ void Widget::connectForPosition(QString position)
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopLeftAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomRightAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomLeftAnimation(QVariant)));
+    anim->setDuration(1000);
     if (position == "top_left") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopLeftAnimation(QVariant)));
     }
@@ -281,6 +297,10 @@ void Widget::connectForPosition(QString position)
     }
     else if (position == "bottom_left") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomLeftAnimation(QVariant)));
+    }
+    else if (position == "top_center") {
+        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopCenterAnimation(QVariant)));
+        anim->setDuration(1000);
     }
 }
 
