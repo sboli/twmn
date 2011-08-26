@@ -24,11 +24,14 @@ so no popup, just a notification slide.
 		- top_left
 		- bottom_right
 		- bottom_left
+		- top_center
+		- bottom_center
+		- center
     absolute_position : An absolute position for the top-left corner of the slide.. You may need
 			to setup this for extended desktop setup (multi-screen). You still have to set position
 			in order to choose the slide animation. If this value is empty, twmd will try to
 			figure out where to display the slide according to your desktop size
-			and the value of position.
+			and the position value.
 			Format : WxH with W and H two integers.
     font : The font family. For example : font=Sans
     font_size : The font pixel size.
