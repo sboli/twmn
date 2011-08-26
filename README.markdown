@@ -46,7 +46,7 @@ position=top_right  ; Accepted values: top_right (tr), top_left (tl), bottom_rig
 
 [icons]
 ; An icon. You can add as many as you want.
-NAME_icon=  ; Path to image file. NAME being the icon's custom name.
+NAME=  ; Path to image file. NAME being the icon's custom name.
 
 
 [main]
