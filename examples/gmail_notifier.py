@@ -4,7 +4,9 @@
 
 """Gmail notifier for twmn.
 
-Enable IMAP in Gmail and it'll work.
+1. Fill in your email and password.
+2. Enable IMAP in Gmail.
+3. Enjoy.
 """
 
 #TODO: handle disconnection
@@ -16,6 +18,7 @@ import re
 import socket
 import time
 
+# Options
 EMAIL = "USERNAME@gmail.com"
 PASSWORD = "PASSWORD"
 FREQUENCY = 30 * 60  # Check emails every 30 minutes
