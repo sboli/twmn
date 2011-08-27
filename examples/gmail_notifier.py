@@ -55,6 +55,7 @@ if __name__ == "__main__":
                             gmail.status("INBOX", "(UNSEEN)")[1][0]).group(1)
         unreadCount = int(unreadCount)
         if unreadCount > 0:
-            content = "{} unread emails.".format(unreadCount)
+            content = "{} unread".format(unreadCount) + \
+                      " email{}.".format(("s" if unreadCount > 1 else ""))
             notification(s, content)
         time.sleep(FREQUENCY)
