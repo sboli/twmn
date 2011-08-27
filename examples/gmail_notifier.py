@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright 2011 Orphée Lafond-Lummis <orftz.com>. No rights reserved.
 
 """Gmail notifier for twmn.

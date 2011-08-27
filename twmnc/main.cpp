@@ -6,11 +6,13 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/lambda/lambda.hpp>
+#include <boost/foreach.hpp>
 #include <exception>
 #include <unistd.h>
 
-std::string DEFAULT_HOST = "127.0.0.1";
-const int   DEFAULT_PORT = 9797;
+const std::string   DEFAULT_HOST = "127.0.0.1";
+const int           DEFAULT_PORT = 9797;
 
 /*!
   * \brief Read the port from the config file
@@ -33,6 +35,48 @@ bool read_port(int& port)
     return value ? port = *value : false;
 }
 
+/*!
+  * \brief Fill tree with command line options from vm
+  * \return true if any command line options was found
+  */
+bool populate_tree(boost::program_options::variables_map& vm, boost::property_tree::ptree& tree)
+{
+    boost::program_options::notify(vm);
+    boost::property_tree::ptree& root = tree.add("root", "");
+    boost::property_tree::ptree empty_root = root;
+    BOOST_FOREACH(boost::program_options::variables_map::value_type& i, vm) {
+        boost::any value = i.second.value();
+        try {
+            root.add(i.first, boost::any_cast<std::string>(value));
+        }
+        catch (const boost::bad_any_cast& e) {
+            root.add(i.first, boost::any_cast<int>(value));
+        }
+    }
+    return empty_root != root; // tree not empty
+}
+
+/*!
+  * \brief Sent tree to the host
+  */
+void send_tree(const boost::program_options::variables_map& vm, const boost::property_tree::ptree& tree)
+{
+    using namespace boost::asio;
+    std::ostringstream oss;
+    boost::property_tree::xml_parser::write_xml(oss, tree);
+    io_service ios;
+    ip::udp::socket s(ios, ip::udp::endpoint(ip::udp::v4(), 0));
+    int port = vm.count("port") ? vm["port"].as<int>() : 0;
+    if (!port)
+        if (!read_port(port))
+            port = DEFAULT_PORT;
+    boost::optional<std::string> host = tree.get_optional<std::string>("content.host");
+    if (!host)
+        host = boost::optional<std::string>(DEFAULT_HOST);
+    s.send_to(buffer(oss.str()), ip::udp::endpoint(ip::address(ip::address_v4::from_string(*host)), port));
+    ios.run();
+}
+
 int main(int argc, char** argv)
 {
     namespace po = boost::program_options;
@@ -43,7 +87,7 @@ int main(int argc, char** argv)
                                                   " in the config file or a file path.")
             ("title,t", po::value<std::string>(), "A title for the notification.")
             ("content,c", po::value<std::string>(), "A content for this notification")
-            ("host,H", po::value<std::string>()->default_value(DEFAULT_HOST), ("The host ip address (x.x.x.x). Default is " + DEFAULT_HOST).c_str())
+            ("host,H", po::value<std::string>(), ("The host ip address (x.x.x.x). Default is " + DEFAULT_HOST).c_str())
             ("port,p", po::value<int>(), "The port to use. Default setting is loaded from the config file.")
             ("layout,l", po::value<std::string>(), "The layout to use. The name of a configuration file.")
             ("size,s", po::value<int>(), "The height of this notification. If not specified the configuration file value is used.")
@@ -58,53 +102,23 @@ int main(int argc, char** argv)
             ("aot", "Always on top. Specially on fullscreen applications, default.")
             ("ac", po::value<std::string>(), "A command to run when the notification is activated.")
     ;
-    po::variables_map vm;
     try {
+        po::variables_map vm;
+        boost::property_tree::ptree tree;
         po::store(po::parse_command_line(argc, argv, desc), vm);
-    }
-    catch (...) {
-        std::cout << desc << std::endl;
-        return 0;
-    }
-    using namespace boost::asio;
-    po::notify(vm);
-    if (vm.count("help")) {
-        std::cout << desc << std::endl;
-        return 0;
-    }
-    try {
-        std::ostringstream out;
-        {
-            boost::property_tree::ptree tree;
-            boost::property_tree::ptree& root = tree.add("root", "");
-            if (vm.count("content"))        root.add("content", vm["content"].as<std::string>());
-            if (vm.count("icon"))           root.add("icon", vm["icon"].as<std::string>());
-            if (vm.count("title"))          root.add("title", vm["title"].as<std::string>());
-            if (vm.count("layout"))         root.add("layout", vm["layout"].as<std::string>());
-            if (vm.count("size"))           root.add("size", vm["size"].as<int>());
-            if (vm.count("pos"))            root.add("pos", vm["pos"].as<std::string>());
-            if (vm.count("fn"))             root.add("fn", vm["fn"].as<std::string>());
-            if (vm.count("fs"))             root.add("fs", vm["fs"].as<std::string>());
-            if (vm.count("duration"))       root.add("duration", vm["duration"].as<int>());
-            if (vm.count("sc"))             root.add("sc", vm["sc"].as<std::string>());
-            if (vm.count("bg"))             root.add("bg", vm["bg"].as<std::string>());
-            if (vm.count("fg"))             root.add("fg", vm["fg"].as<std::string>());
-            if (vm.count("id"))             root.add("id", vm["id"].as<int>());
-            if (vm.count("aot"))            root.add("aot", true);
-            if (vm.count("ac"))             root.add("ac", vm["ac"].as<std::string>());
-            boost::property_tree::xml_parser::write_xml(out, tree);
+        const bool filled = populate_tree(vm, tree);
+        if (!filled && argc > 1) {
+            std::string full_line;
+            std::for_each(argv+1, argv+argc, (full_line += boost::lambda::_1) += " ");
+            full_line.erase(full_line.length()-1);
+            tree.put("root.content", full_line);
         }
-        io_service ios;
-        ip::udp::socket s(ios, ip::udp::endpoint(ip::udp::v4(), 0));
-        int port = vm.count("port") ? vm["port"].as<int>() : 0;
-        if (!port)
-            if (!read_port(port))
-                port = DEFAULT_PORT;
-        s.send_to(buffer(out.str()), ip::udp::endpoint(ip::address(ip::address_v4::from_string(vm["host"].as<std::string>())), port));
-        ios.run();
+        else if (!filled && argc == 1)
+            throw std::runtime_error("Empty command line");
+        send_tree(vm, tree);
     }
-    catch (std::exception& e) {
-        std::cout << "ERROR : " << e.what() << std::endl;
+    catch (const std::exception& e) {
+        std::cout << desc << std::endl;
     }
     return 0;
 }
