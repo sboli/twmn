@@ -87,12 +87,12 @@ void Widget::onDataReceived()
 
 void Widget::appendMessageToQueue(const Message& msg)
 {
-    if (msg.data["id"] && !m_messageQueue.isEmpty() && update(msg))
-        ;
-    else {
-        m_messageQueue.push_back(msg);
-        QTimer::singleShot(30, this, SLOT(processMessageQueue()));
+    if (msg.data["id"] && !m_messageQueue.isEmpty()) {
+        if (update(msg))
+            return;
     }
+    m_messageQueue.push_back(msg);
+    QTimer::singleShot(30, this, SLOT(processMessageQueue()));
 }
 
 void Widget::processMessageQueue()
@@ -290,7 +290,7 @@ int Widget::computeWidth()
 void Widget::setupFont()
 {
     Message& m = m_messageQueue.front();
-    QFont font("Sans");
+    QFont font;
     QString name = m.data["fn"]->toString();
     // Trick to detect a font in XFD format.
     if (name.count('-') >= 4)
@@ -352,7 +352,6 @@ void Widget::connectForPosition(QString position)
     else {
         // top_right seems to be the classic case so fallback to it.
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopRightAnimation(QVariant)));
-        qDebug() << "default position";
     }
 }
 
@@ -483,9 +482,11 @@ bool Widget::update(const Message &m)
         if (it->data["id"] && it->data["id"]->toInt() == m.data["id"]->toInt()) {
             it->data = m.data;
             found = true;
+            break;
         }
     }
-    if (found && !m_messageQueue.isEmpty() && m_messageQueue.front().data["id"]->toInt() == m.data["id"]->toInt()) {
+    if (found && !m_messageQueue.isEmpty() && m_messageQueue.front().data["id"]
+        && m_messageQueue.front().data["id"]->toInt() == m.data["id"]->toInt()) {
         loadDefaults();
         setupFont();
         setupColors();
