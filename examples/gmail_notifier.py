@@ -4,7 +4,9 @@
 
 """Gmail notifier for twmn.
 
-Enable IMAP in Gmail and it'll work.
+1. Fill in your email and password.
+2. Enable IMAP in Gmail.
+3. Enjoy.
 """
 
 #TODO: handle disconnection
@@ -16,6 +18,7 @@ import re
 import socket
 import time
 
+# Options
 EMAIL = "USERNAME@gmail.com"
 PASSWORD = "PASSWORD"
 FREQUENCY = 30 * 60  # Check emails every 30 minutes
@@ -52,6 +55,7 @@ if __name__ == "__main__":
                             gmail.status("INBOX", "(UNSEEN)")[1][0]).group(1)
         unreadCount = int(unreadCount)
         if unreadCount > 0:
-            content = "{} unread emails.".format(unreadCount)
+            content = "{} unread".format(unreadCount) + \
+                      " email{}.".format(("s" if unreadCount > 1 else ""))
             notification(s, content)
         time.sleep(FREQUENCY)
