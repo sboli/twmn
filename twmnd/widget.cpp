@@ -588,6 +588,7 @@ void Widget::onHide()
 
 void Widget::autoNext()
 {
+    Q_ASSERT (m_messageQueue.size() >= 2);
     Message&m = m_messageQueue.front();
     // The user already saw it manually.
     if (m.data["manually_shown"]) {
@@ -595,9 +596,8 @@ void Widget::autoNext()
         reverseStart();
     }
     else {
-        QString soundCommand = m.data["sc"]->toString();
-        if (!soundCommand.isEmpty())
-            QProcess::startDetached(soundCommand);
+        if ((m_messageQueue.begin()+1)->data["sc"])
+            QProcess::startDetached((m_messageQueue.begin()+1)->data["sc"]->toString());
     }
     onNext();
 }
