@@ -15,6 +15,10 @@ About twmn.conf
 ---------------
 <pre>
 [gui]
+; Screen number to display notifications on when using a multi-head desktop.
+screen=  ; 0 indexed screen number
+
+; WARNING: Deprecated by "screen"
 ; Absolute position from the top-left corner of the slide. You may need it for a multi-screen setup.
 ; You still have to set position in order to choose the slide animation. If empty, twmnd will try
 ; to figure out where to display the slide according to your desktop size and the slide position.

@@ -106,7 +106,7 @@ void Widget::processMessageQueue()
     Message& m = m_messageQueue.front();
     loadDefaults();
     if (m.data["aot"]->toBool())
-        raise();
+        setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::X11BypassWindowManagerHint);
     setupFont();
     setupColors();
     setupIcon();
@@ -129,23 +129,28 @@ void Widget::updateTopLeftAnimation(QVariant value)
 {
     const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
     QPoint p(0, 0);
-    if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
+    if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
+        p = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).topLeft();
+    } else if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
         if (!tmp.isNull())
             p = tmp;
     }
-    setGeometry(p.y(), p.y(), value.toInt(), finalHeight);
+    setGeometry(p.x(), p.y(), value.toInt(), finalHeight);
     layout()->setSpacing(0);
     show();
 }
 
 void Widget::updateTopRightAnimation(QVariant value)
 {
-    const int end = QDesktopWidget().availableGeometry(this).width();
+    const int end = QDesktopWidget().screenGeometry(this).width();
     const int val = value.toInt();
     const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
     QPoint p(end, 0);
-    if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
+    if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
+        p = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).topRight();
+        ++p.rx();
+    } else if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
         if (!tmp.isNull())
             p = tmp;
@@ -157,12 +162,16 @@ void Widget::updateTopRightAnimation(QVariant value)
 
 void Widget::updateBottomRightAnimation(QVariant value)
 {
-    const int wend = QDesktopWidget().availableGeometry(this).width();
-    const int hend = QDesktopWidget().availableGeometry(this).height();
+    const int wend = QDesktopWidget().screenGeometry(this).width();
+    const int hend = QDesktopWidget().screenGeometry(this).height();
     const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
     const int val = value.toInt();
     QPoint p(wend, hend);
-    if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
+    if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
+        p = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).bottomRight();
+        ++p.rx();
+        ++p.ry();
+    } else if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
         if (!tmp.isNull())
             p = tmp;
@@ -174,11 +183,14 @@ void Widget::updateBottomRightAnimation(QVariant value)
 
 void Widget::updateBottomLeftAnimation(QVariant value)
 {
-    const int hend = QDesktopWidget().availableGeometry(this).height();
+    const int hend = QDesktopWidget().screenGeometry(this).height();
     const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
     const int val = value.toInt();
     QPoint p(0, hend);
-    if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
+    if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
+        p = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).bottomLeft();
+        ++p.ry();
+    } else if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
         if (!tmp.isNull())
             p = tmp;
@@ -193,14 +205,19 @@ void Widget::updateTopCenterAnimation(QVariant value)
     const int finalWidth = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->endValue().toInt();
     const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
     const int h = value.toInt() * finalHeight / finalWidth;
-    const int wend = QDesktopWidget().availableGeometry(this).width();
-    QPoint p(wend, 0);
-    if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
+    const int wend = QDesktopWidget().screenGeometry(this).width();
+    QPoint p1(wend, 0);
+    QPoint p2(0, 0);
+    if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
+        p1 = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).topRight();
+        ++p1.rx();
+        p2 = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).topLeft();
+    } else if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
         if (!tmp.isNull())
-            p = tmp;
+            p1 = tmp;
     }
-    setGeometry(p.x()/2 - finalWidth/2, p.y(), finalWidth, h);
+    setGeometry((p2.x() - p1.x())/2 - finalWidth/2 + p1.x(), p1.y(), finalWidth, h);
     layout()->setSpacing(0);
     show();
 }
@@ -210,15 +227,21 @@ void Widget::updateBottomCenterAnimation(QVariant value)
     const int finalWidth = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->endValue().toInt();
     const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
     const int h = value.toInt() * finalHeight / finalWidth;
-    const int wend = QDesktopWidget().availableGeometry(this).width();
-    const int hend = QDesktopWidget().availableGeometry(this).height();
-    QPoint p(wend, hend);
-    if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
+    const int wend = QDesktopWidget().screenGeometry(this).width();
+    const int hend = QDesktopWidget().screenGeometry(this).height();
+    QPoint p1(wend, hend);
+    QPoint p2(0, 0);
+    if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
+        p1 = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).bottomRight();
+        ++p1.rx();
+        ++p1.ry();
+        p2 = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).topLeft();
+    } else if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
         if (!tmp.isNull())
-            p = tmp;
+            p1 = tmp;
     }
-    setGeometry(p.x()/2 - finalWidth/2, p.y()-h, finalWidth, h);
+    setGeometry((p2.x() - p1.x())/2 - finalWidth/2 + p1.x(), p1.y()-h, finalWidth, h);
     layout()->setSpacing(0);
     show();
 }
@@ -228,15 +251,21 @@ void Widget::updateCenterAnimation(QVariant value)
     const int finalWidth = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->endValue().toInt();
     const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
     const int h = value.toInt() * finalHeight / finalWidth;
-    const int wend = QDesktopWidget().availableGeometry(this).width();
-    const int hend = QDesktopWidget().availableGeometry(this).height();
-    QPoint p(wend, hend);
-    if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
+    const int wend = QDesktopWidget().screenGeometry(this).width();
+    const int hend = QDesktopWidget().screenGeometry(this).height();
+    QPoint p1(wend, hend);
+    QPoint p2(0, 0);
+    if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
+        p1 = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).bottomRight();
+        ++p1.rx();
+        ++p1.ry();
+        p2 = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).topLeft();
+    } else if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
         if (!tmp.isNull())
-            p = tmp;
+            p1 = tmp;
     }
-    setGeometry(p.x()/2 - value.toInt()/2, p.y()/2 - h/2, value.toInt(), h);
+    setGeometry((p2.x() - p1.x())/2 - value.toInt()/2 + p1.x(), p1.y()/2 - h/2, value.toInt(), h);
     layout()->setSpacing(0);
     show();
 }
