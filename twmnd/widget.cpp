@@ -106,7 +106,7 @@ void Widget::processMessageQueue()
     Message& m = m_messageQueue.front();
     loadDefaults();
     if (m.data["aot"]->toBool())
-        raise();
+        setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::X11BypassWindowManagerHint);
     setupFont();
     setupColors();
     setupIcon();
