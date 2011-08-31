@@ -46,6 +46,17 @@ height=18  ; In pixel.
 position=top_right  ; Accepted values: top_right (tr), top_left (tl), bottom_right (br),
                     ; bottom_left (bl), top_center (tc), bottom_center (bc), center (c).
 
+; The animation to use when the slide appear
+in_animation=38 ; see [the qt documentation](http://doc.qt.nokia.com/latest/qeasingcurve.html#Type-enum) for types
+
+; The in animation's duration
+in_animation_duration=1000 ; in milliseconds
+
+; The animation to use whe the slide is closing
+out_animation=13
+
+; The out animation's duration
+out_animation_duration=1000
 
 [icons]
 ; An icon. You can add as many as you want.

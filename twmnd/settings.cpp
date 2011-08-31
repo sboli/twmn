@@ -18,6 +18,10 @@ Settings::Settings(QString file) : m_file(file)
     m_defaultSettings["gui/foreground_color"] = "#999999";
     m_defaultSettings["gui/background_color"] = "#000000";
     m_defaultSettings["gui/always_on_top"] = true;
+    m_defaultSettings["gui/in_animation"] = 38;
+    m_defaultSettings["gui/in_animation_duration"] = 1000;
+    m_defaultSettings["gui/out_animation"] = 13;
+    m_defaultSettings["gui/out_animation_duration"] = 1000;
     m_defaultSettings["icons/critical_icon"] = "";
     m_defaultSettings["icons/warning_icon"] = "";
     m_defaultSettings["icons/info_icon"] = "";

@@ -26,7 +26,7 @@ Widget::Widget() : m_shortcutGrabber(this, m_settings)
     QPropertyAnimation* anim = new QPropertyAnimation(this);
     anim->setTargetObject(this);
     m_animation.addAnimation(anim);
-    anim->setEasingCurve(QEasingCurve::OutBounce);
+    anim->setEasingCurve(QEasingCurve::Type(m_settings.get("gui/in_animation").toInt()));
     connect(anim, SIGNAL(finished()), this, SLOT(reverseTrigger()));
     connectForPosition(m_settings.get("gui/position").toString());
     connect(&m_dbus, SIGNAL(messageReceived(Message)), this, SLOT(appendMessageToQueue(Message)));
@@ -115,7 +115,7 @@ void Widget::processMessageQueue()
     connectForPosition(m.data["pos"]->toString());
     m_animation.setDirection(QAnimationGroup::Forward);
     int width = computeWidth();
-    qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEasingCurve(QEasingCurve::OutBounce);
+    qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEasingCurve(QEasingCurve::Type(m_settings.get("gui/in_animation").toInt()));
     qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setStartValue(0);
     qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEndValue(width);
     m_animation.start();
@@ -285,8 +285,9 @@ void Widget::reverseStart()
     if (m_messageQueue.size() <= 1) {
         if (!m_messageQueue.isEmpty())
             m_messageQueue.pop_front();
+        qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setDuration(m_settings.get("gui/out_animation_duration").toInt());
+        qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEasingCurve(QEasingCurve::Type(m_settings.get("gui/out_animation").toInt()));
         m_animation.setDirection(QAnimationGroup::Backward);
-        qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEasingCurve(QEasingCurve::InCubic);
         m_animation.start();
         m_shortcutGrabber.disableShortcuts();
     }
@@ -349,6 +350,7 @@ void Widget::connectForPosition(QString position)
     QPropertyAnimation* anim = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0));
     if (!anim)
         return;
+    anim->setDuration(m_settings.get("gui/in_animation_duration").toInt());
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopLeftAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopRightAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomRightAnimation(QVariant)));
@@ -356,7 +358,6 @@ void Widget::connectForPosition(QString position)
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopCenterAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomCenterAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateCenterAnimation(QVariant)));
-    anim->setDuration(1000);
     if (position == "top_left" || position == "tl") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopLeftAnimation(QVariant)));
     }
