@@ -47,7 +47,7 @@ position=top_right  ; Accepted values: top_right (tr), top_left (tl), bottom_rig
                     ; bottom_left (bl), top_center (tc), bottom_center (bc), center (c).
 
 ; The animation to use when the slide appear
-in_animation=38 ; see [the qt documentation](http://doc.qt.nokia.com/latest/qeasingcurve.html#Type-enum) for types
+in_animation=38 ; see http://doc.qt.nokia.com/latest/qeasingcurve.html#Type-enum for types
 
 ; The in animation's duration
 in_animation_duration=1000 ; in milliseconds
