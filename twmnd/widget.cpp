@@ -105,8 +105,10 @@ void Widget::processMessageQueue()
     boldFont.setBold(true);
     Message& m = m_messageQueue.front();
     loadDefaults();
-    if (m.data["aot"]->toBool())
+    if (m.data["aot"]->toBool()) {
         setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::X11BypassWindowManagerHint);
+        raise();
+    }
     setupFont();
     setupColors();
     setupIcon();
