@@ -272,6 +272,64 @@ void Widget::updateCenterAnimation(QVariant value)
     show();
 }
 
+void Widget::startBounce()
+{
+    QPropertyAnimation* anim = new QPropertyAnimation(this);
+    anim->setTargetObject(this);
+    m_animation.addAnimation(anim);
+    anim->setEasingCurve(QEasingCurve::OutQuad);
+    anim->setStartValue(0);
+    QString position = m_messageQueue.front().data["pos"]->toString();
+    if (position == "top_center" || position == "tc" ||
+        position == "bottom_center" || position == "bc" ||
+        position == "center" || position == "c")
+        anim->setEndValue(height());
+    else
+        anim->setEndValue(40);
+    tmpBouncePos = pos();
+    anim->start();
+
+    connect(anim, SIGNAL(finished()), this, SLOT(unbounce()));
+    connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBounceAnimation(QVariant)));
+}
+
+void Widget::unbounce()
+{
+    QPropertyAnimation* anim = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(1));
+    if (!anim)
+        return;
+    disconnect(anim, SIGNAL(finished()), this, SLOT(unbounce()));
+    connect(anim, SIGNAL(finished()), this, SLOT(doneBounce()));
+    anim->setDirection(QAnimationGroup::Backward);
+    anim->setEasingCurve(QEasingCurve::InBounce);
+    anim->setDuration(1000);
+    anim->start();
+}
+
+void Widget::doneBounce()
+{
+    m_animation.removeAnimation(qobject_cast<QPropertyAnimation*>(m_animation.animationAt(1)));
+}
+
+void Widget::updateBounceAnimation(QVariant value)
+{
+    QString position = m_messageQueue.front().data["pos"]->toString();
+    if (position == "top_left" || position == "tl" ||
+        position == "bottom_left" || position == "bl")
+        move(tmpBouncePos.x() + value.toInt(), tmpBouncePos.y());
+    else if (position == "top_right" || position == "tr" ||
+             position == "bottom_right" || position == "br")
+        move(tmpBouncePos.x() - value.toInt(), tmpBouncePos.y());
+    else if (position == "top_center" || position == "tc")
+        move(tmpBouncePos.x(), tmpBouncePos.y() + value.toInt());
+    else if (position == "bottom_center" || position == "bc")
+        move(tmpBouncePos.x(), tmpBouncePos.y() - value.toInt());
+    else if (position == "center" || position == "c")
+        move(tmpBouncePos.x(), tmpBouncePos.y() - value.toInt());
+    layout()->setSpacing(0);
+    show();
+}
+
 void Widget::reverseTrigger()
 {
     if (m_animation.direction() == QAnimationGroup::Backward) {
@@ -481,6 +539,8 @@ void Widget::loadDefaults()
         m.data["aot"] = boost::optional<QVariant>(s->get("gui/always_on_top"));
     if (!m.data["ac"])
         m.data["ac"] = boost::optional<QVariant>(s->get("main/activate_command"));
+    if (!m.data["bounce"])
+        m.data["bounce"] = boost::optional<QVariant>(s->get("gui/bounce"));
     if (s != &m_settings)
         delete s;
 }
@@ -591,6 +651,7 @@ void Widget::onNext()
     if (m_messageQueue.size() < 2)
         return;
     Message m = m_messageQueue.front();
+    boost::optional<QVariant> tmpManual = m.data["manually_shown"];
     m.data["manually_shown"] = boost::optional<QVariant>(true);
     m_previousStack.push(m);
     m_messageQueue.pop_front();
@@ -602,6 +663,8 @@ void Widget::onNext()
     setupContent();
     connectForPosition(m_messageQueue.front().data["pos"]->toString());
     updateFinalWidth();
+    if (m_messageQueue.front().data["bounce"] && !tmpManual)
+        startBounce();
 }
 
 void Widget::onActivate()
