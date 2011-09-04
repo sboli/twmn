@@ -30,6 +30,10 @@ private slots:
     void                    updateTopCenterAnimation(QVariant value);
     void                    updateBottomCenterAnimation(QVariant value);
     void                    updateCenterAnimation(QVariant value);
+    void                    startBounce();
+    void                    unbounce();
+    void                    doneBounce();
+    void                    updateBounceAnimation(QVariant value);
     void                    reverseTrigger();
     void                    reverseStart();
 
@@ -119,6 +123,7 @@ private:
     QTimer                  m_visible;
     ShortcutGrabber         m_shortcutGrabber;
     QStack<Message>         m_previousStack;
+    QPoint                  tmpBouncePos;
 };
 
 #endif // WIDGET_H

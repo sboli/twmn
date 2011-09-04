@@ -58,6 +58,9 @@ out_animation=13
 ; The out animation's duration
 out_animation_duration=1000
 
+; Enable or disable notification bounce when changing notification
+bounce=true  ; true or false
+
 [icons]
 ; An icon. You can add as many as you want.
 NAME=  ; Path to image file. NAME being the icon's custom name.
