@@ -8,7 +8,7 @@ TARGET = twmnc
 DEPENDPATH += .
 INCLUDEPATH += .
 DESTDIR = ../bin/
-LIBS += -lboost_program_options -lboost_system
+LIBS += -lboost_program_options -lboost_system -lpthread
 target.path += /usr/local/bin
 INSTALLS += target
 # Input
