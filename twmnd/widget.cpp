@@ -17,6 +17,9 @@
 #include <QShortcut>
 #include <QIcon>
 #include <QWheelEvent>
+#include <QCursor>
+#include <QX11Info>
+#include <X11/extensions/Xfixes.h>
 #include "settings.h"
 #include "shortcutgrabber.h"
 
@@ -272,6 +275,18 @@ void Widget::updateCenterAnimation(QVariant value)
     show();
 }
 
+void Widget::updateBelowCursorAnimation(QVariant value)
+{
+    const int finalWidth = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->endValue().toInt();
+    const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
+    const int h = value.toInt() * finalHeight / finalWidth;
+    const QPoint p = QCursor::pos();
+    const XFixesCursorImage *xcim = XFixesGetCursorImage(QX11Info::display());
+    setGeometry(p.x() - finalWidth / 2, p.y() + xcim->height + 10, value.toInt(), h);
+    layout()->setSpacing(0);
+    show();
+}
+
 void Widget::startBounce()
 {
     QPropertyAnimation* anim = new QPropertyAnimation(this);
@@ -282,7 +297,8 @@ void Widget::startBounce()
     QString position = m_messageQueue.front().data["pos"]->toString();
     if (position == "top_center" || position == "tc" ||
         position == "bottom_center" || position == "bc" ||
-        position == "center" || position == "c")
+        position == "center" || position == "c" ||
+        position == "below_cursor" || position == "bcur")
         anim->setEndValue(height());
     else
         anim->setEndValue(40);
@@ -325,6 +341,8 @@ void Widget::updateBounceAnimation(QVariant value)
     else if (position == "bottom_center" || position == "bc")
         move(tmpBouncePos.x(), tmpBouncePos.y() - value.toInt());
     else if (position == "center" || position == "c")
+        move(tmpBouncePos.x(), tmpBouncePos.y() - value.toInt());
+    else if (position == "below_cursor" || position == "bcur")
         move(tmpBouncePos.x(), tmpBouncePos.y() - value.toInt());
     layout()->setSpacing(0);
     show();
@@ -438,6 +456,9 @@ void Widget::connectForPosition(QString position)
     }
     else if (position == "center" || position == "c") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateCenterAnimation(QVariant)));
+    }
+    else if (position == "below_cursor" || position == "bcur") {
+        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBelowCursorAnimation(QVariant)));
     }
     else {
         // top_right seems to be the classic case so fallback to it.
@@ -626,6 +647,8 @@ void Widget::updateFinalWidth()
         updateBottomCenterAnimation(width);
     else if (position == "center" || position == "c")
         updateCenterAnimation(width);
+    else if (position == "below_cursor" || position == "bcur")
+        updateBelowCursorAnimation(width);
 }
 
 void Widget::onPrevious()

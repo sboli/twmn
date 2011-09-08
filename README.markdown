@@ -44,7 +44,8 @@ height=18  ; In pixel.
 
 ; Position of the notification slide.
 position=top_right  ; Accepted values: top_right (tr), top_left (tl), bottom_right (br),
-                    ; bottom_left (bl), top_center (tc), bottom_center (bc), center (c).
+                    ; bottom_left (bl), top_center (tc), bottom_center (bc), center (c),
+                    ; below_cursor (bcur).
 
 ; The animation to use when the slide appear
 in_animation=38 ; see http://doc.qt.nokia.com/latest/qeasingcurve.html#Type-enum for types
