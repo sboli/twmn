@@ -10,7 +10,7 @@ TARGET = twmnd
 TEMPLATE = app
 CONFIG += release
 DESTDIR = ../bin/
-LIBS += `pkg-config --libs-only-l dbus-1`
+LIBS += `pkg-config --libs-only-l dbus-1` -lXfixes
 QMAKE_CXXFLAGS += `pkg-config --cflags-only-I dbus-1`
 
 target.path+=/usr/local/bin
