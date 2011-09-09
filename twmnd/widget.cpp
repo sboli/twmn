@@ -17,6 +17,9 @@
 #include <QShortcut>
 #include <QIcon>
 #include <QWheelEvent>
+#include <QCursor>
+#include <QX11Info>
+#include <X11/extensions/Xfixes.h>
 #include "settings.h"
 #include "shortcutgrabber.h"
 
@@ -129,7 +132,7 @@ void Widget::processMessageQueue()
 
 void Widget::updateTopLeftAnimation(QVariant value)
 {
-    const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
+    const int finalHeight = getHeight();
     QPoint p(0, 0);
     if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
         p = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).topLeft();
@@ -147,7 +150,7 @@ void Widget::updateTopRightAnimation(QVariant value)
 {
     const int end = QDesktopWidget().screenGeometry(this).width();
     const int val = value.toInt();
-    const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
+    const int finalHeight = getHeight();
     QPoint p(end, 0);
     if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
         p = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).topRight();
@@ -166,7 +169,7 @@ void Widget::updateBottomRightAnimation(QVariant value)
 {
     const int wend = QDesktopWidget().screenGeometry(this).width();
     const int hend = QDesktopWidget().screenGeometry(this).height();
-    const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
+    const int finalHeight = getHeight();
     const int val = value.toInt();
     QPoint p(wend, hend);
     if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
@@ -186,7 +189,7 @@ void Widget::updateBottomRightAnimation(QVariant value)
 void Widget::updateBottomLeftAnimation(QVariant value)
 {
     const int hend = QDesktopWidget().screenGeometry(this).height();
-    const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
+    const int finalHeight = getHeight();
     const int val = value.toInt();
     QPoint p(0, hend);
     if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
@@ -205,7 +208,7 @@ void Widget::updateBottomLeftAnimation(QVariant value)
 void Widget::updateTopCenterAnimation(QVariant value)
 {
     const int finalWidth = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->endValue().toInt();
-    const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
+    const int finalHeight = getHeight();
     const int h = value.toInt() * finalHeight / finalWidth;
     const int wend = QDesktopWidget().screenGeometry(this).width();
     QPoint p1(wend, 0);
@@ -227,7 +230,7 @@ void Widget::updateTopCenterAnimation(QVariant value)
 void Widget::updateBottomCenterAnimation(QVariant value)
 {
     const int finalWidth = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->endValue().toInt();
-    const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
+    const int finalHeight = getHeight();
     const int h = value.toInt() * finalHeight / finalWidth;
     const int wend = QDesktopWidget().screenGeometry(this).width();
     const int hend = QDesktopWidget().screenGeometry(this).height();
@@ -251,7 +254,7 @@ void Widget::updateBottomCenterAnimation(QVariant value)
 void Widget::updateCenterAnimation(QVariant value)
 {
     const int finalWidth = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->endValue().toInt();
-    const int finalHeight = m_animation.direction() == QAbstractAnimation::Forward ? m_messageQueue.front().data["size"]->toInt() : height();
+    const int finalHeight = getHeight();
     const int h = value.toInt() * finalHeight / finalWidth;
     const int wend = QDesktopWidget().screenGeometry(this).width();
     const int hend = QDesktopWidget().screenGeometry(this).height();
@@ -272,6 +275,18 @@ void Widget::updateCenterAnimation(QVariant value)
     show();
 }
 
+void Widget::updateBelowCursorAnimation(QVariant value)
+{
+    const int finalWidth = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->endValue().toInt();
+    const int finalHeight = getHeight();
+    const int h = value.toInt() * finalHeight / finalWidth;
+    const QPoint p = QCursor::pos();
+    const XFixesCursorImage *xcim = XFixesGetCursorImage(QX11Info::display());
+    setGeometry(p.x() - finalWidth / 2, p.y() + xcim->height + 10, value.toInt(), h);
+    layout()->setSpacing(0);
+    show();
+}
+
 void Widget::startBounce()
 {
     QPropertyAnimation* anim = new QPropertyAnimation(this);
@@ -282,7 +297,8 @@ void Widget::startBounce()
     QString position = m_messageQueue.front().data["pos"]->toString();
     if (position == "top_center" || position == "tc" ||
         position == "bottom_center" || position == "bc" ||
-        position == "center" || position == "c")
+        position == "center" || position == "c" ||
+        position == "below_cursor" || position == "bcur")
         anim->setEndValue(height());
     else
         anim->setEndValue(40);
@@ -325,6 +341,8 @@ void Widget::updateBounceAnimation(QVariant value)
     else if (position == "bottom_center" || position == "bc")
         move(tmpBouncePos.x(), tmpBouncePos.y() - value.toInt());
     else if (position == "center" || position == "c")
+        move(tmpBouncePos.x(), tmpBouncePos.y() - value.toInt());
+    else if (position == "below_cursor" || position == "bcur")
         move(tmpBouncePos.x(), tmpBouncePos.y() - value.toInt());
     layout()->setSpacing(0);
     show();
@@ -438,6 +456,9 @@ void Widget::connectForPosition(QString position)
     }
     else if (position == "center" || position == "c") {
         connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateCenterAnimation(QVariant)));
+    }
+    else if (position == "below_cursor" || position == "bcur") {
+        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBelowCursorAnimation(QVariant)));
     }
     else {
         // top_right seems to be the classic case so fallback to it.
@@ -626,6 +647,8 @@ void Widget::updateFinalWidth()
         updateBottomCenterAnimation(width);
     else if (position == "center" || position == "c")
         updateCenterAnimation(width);
+    else if (position == "below_cursor" || position == "bcur")
+        updateBelowCursorAnimation(width);
 }
 
 void Widget::onPrevious()
@@ -711,4 +734,10 @@ void Widget::wheelEvent(QWheelEvent *e)
     else if (e->delta() < 0)
         onNext();
     QWidget::wheelEvent(e);
+}
+
+std::size_t Widget::getHeight()
+{
+    return m_animation.direction() == QAbstractAnimation::Forward && m_messageQueue.size() ?
+                m_messageQueue.front().data["size"]->toInt() : height();
 }

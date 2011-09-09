@@ -30,6 +30,7 @@ private slots:
     void                    updateTopCenterAnimation(QVariant value);
     void                    updateBottomCenterAnimation(QVariant value);
     void                    updateCenterAnimation(QVariant value);
+    void                    updateBelowCursorAnimation(QVariant value);
     void                    startBounce();
     void                    unbounce();
     void                    doneBounce();
@@ -112,6 +113,8 @@ private:
     bool                    update(const Message& m);
 
     QPoint                  stringToPos(QString string);
+
+    inline std::size_t      getHeight();
 
 private:
     Settings                m_settings;
