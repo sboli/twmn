@@ -30,7 +30,6 @@ private slots:
     void                    updateTopCenterAnimation(QVariant value);
     void                    updateBottomCenterAnimation(QVariant value);
     void                    updateCenterAnimation(QVariant value);
-    void                    updateBelowCursorAnimation(QVariant value);
     void                    startBounce();
     void                    unbounce();
     void                    doneBounce();
