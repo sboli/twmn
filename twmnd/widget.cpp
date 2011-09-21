@@ -412,7 +412,9 @@ void Widget::connectForPosition(QString position)
     QPropertyAnimation* anim = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0));
     if (!anim)
         return;
-    anim->setDuration(m_settings.get("gui/in_animation_duration").toInt());
+    int duration = m_settings.get("gui/in_animation_duration").toInt();
+    if (anim->duration() != duration)
+        anim->setDuration(duration);
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopLeftAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopRightAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomRightAnimation(QVariant)));
