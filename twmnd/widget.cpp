@@ -276,6 +276,8 @@ void Widget::updateCenterAnimation(QVariant value)
 
 void Widget::startBounce()
 {
+    if (!m_settings.get("gui/bounce").toBool())
+        return;
     QPropertyAnimation* anim = new QPropertyAnimation(this);
     anim->setTargetObject(this);
     m_animation.addAnimation(anim);
@@ -290,7 +292,6 @@ void Widget::startBounce()
         anim->setEndValue(40);
     tmpBouncePos = pos();
     anim->start();
-
     connect(anim, SIGNAL(finished()), this, SLOT(unbounce()));
     connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBounceAnimation(QVariant)));
 }
@@ -338,7 +339,17 @@ void Widget::reverseTrigger()
         QTimer::singleShot(30, this, SLOT(processMessageQueue()));
         return;
     }
-    m_visible.setInterval(m_messageQueue.front().data["duration"]->toInt());
+    const bool bounce = m_settings.get("gui/bounce").toBool();
+    const int duration = m_messageQueue.front().data["duration"]->toInt();
+    const unsigned int minDuration = 2010; // 2 x bounce and a little delay
+    if (duration == -1)
+        m_visible.setInterval(duration);
+    else { // ensure its visible long enough to bounce
+        if (bounce)
+            m_visible.setInterval(duration < minDuration ? minDuration : duration);
+        else
+            m_visible.setInterval(duration);
+    }
     m_visible.start();
 }
 
