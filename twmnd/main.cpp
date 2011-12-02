@@ -37,6 +37,9 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     QApplication::setQuitOnLastWindowClosed(true);
     QApplication::setApplicationName("twmn");
+    QPalette p = a.palette();
+    p.setBrush(QPalette::Link, QBrush(QColor("black")));
+    a.setPalette(p);
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
     QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
