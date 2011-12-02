@@ -43,6 +43,8 @@ Widget::Widget() : m_shortcutGrabber(this, m_settings)
     l->addWidget(m_contentView["icon"] = new QLabel);
     l->addWidget(m_contentView["title"] = new QLabel);
     l->addWidget(m_contentView["text"] = new QLabel);
+    m_contentView["title"]->setOpenExternalLinks(true);
+    m_contentView["text"]->setOpenExternalLinks(true);
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onHide()));
     // Let the event loop run
