@@ -8,9 +8,9 @@ QT       += core gui network
 DEFINES += QT_NO_DEBUG_OUTPUT
 TARGET = twmnd
 TEMPLATE = app
-CONFIG += release
+CONFIG += debug
 DESTDIR = ../bin/
-LIBS += `pkg-config --libs-only-l dbus-1`
+LIBS += `pkg-config --libs-only-l dbus-1` -lX11 -lXext
 QMAKE_CXXFLAGS += `pkg-config --cflags-only-I dbus-1`
 
 target.path+=/usr/local/bin
