@@ -30,7 +30,11 @@ def cred_from_muttrc():
         password = re_pass.group(1)
     return user, password
 
+
 # Options
+# EMAIL = "USERNAME@gmail.com"
+# PASSWORD = "SECRET"
+# ... or if ~/.muttrc exists, read it.
 EMAIL, PASSWORD = cred_from_muttrc()
 FREQUENCY = 30 * 60  # Check emails every 30 minutes
 TWMN_PORT = 9797
