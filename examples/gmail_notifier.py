@@ -17,10 +17,25 @@ import imaplib
 import re
 import socket
 import time
+import os
+
+def cred_from_muttrc():
+    with open(os.path.expanduser('~/.muttrc')) as fin:
+        data = fin.read()
+    re_user = re.search(r'set\s+imap_user\s*=\s*"(.*)"', data, re.MULTILINE)
+    re_pass = re.search(r'set\s+imap_pass\s*=\s*"(.*)"', data, re.MULTILINE)
+    if re_user:
+        user = re_user.group(1)
+    if re_pass:
+        password = re_pass.group(1)
+    return user, password
+
 
 # Options
-EMAIL = "USERNAME@gmail.com"
-PASSWORD = "PASSWORD"
+# EMAIL = "USERNAME@gmail.com"
+# PASSWORD = "SECRET"
+# ... or if ~/.muttrc exists, read it.
+EMAIL, PASSWORD = cred_from_muttrc()
 FREQUENCY = 30 * 60  # Check emails every 30 minutes
 TWMN_PORT = 9797
 TWNM_ADDR = "127.0.0.1"
@@ -31,6 +46,7 @@ def notification(sock, content):
     message = "<root>" + \
               "<title>{}</title>".format(TITLE) + \
               "<content>{}</content>".format(content) + \
+              "<icon>{}</icon>".format("email_icon") + \
               "</root>"
     sock.send(bytes(message.encode("utf-8")))
 
