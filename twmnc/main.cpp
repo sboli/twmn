@@ -32,7 +32,12 @@ bool read_port(int& port)
     boost::property_tree::ptree tree;
     boost::property_tree::ini_parser::read_ini(in, tree);
     boost::optional<int> value =  tree.get_optional<int>("main.port");
-    return value ? port = *value : false;
+    if (value)
+    {
+        port = *value;
+        return true;
+    }
+    return false;
 }
 
 /*!

@@ -343,7 +343,7 @@ void Widget::reverseTrigger()
     }
     const bool bounce = m_settings.get("gui/bounce").toBool();
     const int duration = m_messageQueue.front().data["duration"]->toInt();
-    const unsigned int minDuration = 2010; // 2 x bounce and a little delay
+    const int minDuration = 2010; // 2 x bounce and a little delay
     if (duration == -1)
         m_visible.setInterval(duration);
     else { // ensure its visible long enough to bounce
