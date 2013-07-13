@@ -31,7 +31,6 @@ Widget::Widget() : m_shortcutGrabber(this, m_settings)
     anim->setEasingCurve(QEasingCurve::Type(m_settings.get("gui/in_animation").toInt()));
     connect(anim, SIGNAL(finished()), this, SLOT(reverseTrigger()));
     connectForPosition(m_settings.get("gui/position").toString());
-    connect(&m_dbus, SIGNAL(messageReceived(Message)), this, SLOT(appendMessageToQueue(Message)));
     connect(&m_visible, SIGNAL(timeout()), this, SLOT(reverseStart()));
     m_visible.setSingleShot(true);
     QAbstractEventDispatcher::instance()->setEventFilter(ShortcutGrabber::eventFilter);
@@ -53,6 +52,11 @@ Widget::Widget() : m_shortcutGrabber(this, m_settings)
 
 Widget::~Widget()
 {
+}
+
+void Widget::connectToDBus(const DBusInterface& dbus)
+{
+    connect(&dbus, SIGNAL(messageReceived(Message)), this, SLOT(appendMessageToQueue(Message)));
 }
 
 void Widget::init()
@@ -343,7 +347,7 @@ void Widget::reverseTrigger()
     }
     const bool bounce = m_settings.get("gui/bounce").toBool();
     const int duration = m_messageQueue.front().data["duration"]->toInt();
-    const unsigned int minDuration = 2010; // 2 x bounce and a little delay
+    const int minDuration = 2010; // 2 x bounce and a little delay
     if (duration == -1)
         m_visible.setInterval(duration);
     else { // ensure its visible long enough to bounce
