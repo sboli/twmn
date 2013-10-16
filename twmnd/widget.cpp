@@ -158,8 +158,9 @@ void Widget::updateTopRightAnimation(QVariant value)
         ++p.rx();
     } else if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
-        if (!tmp.isNull())
-            p = tmp;
+        if (!tmp.isNull()) {
+          p = tmp;
+        }
     }
     setGeometry(p.x()-val, p.y(), val, finalHeight);
     layout()->setSpacing(0);
@@ -622,6 +623,11 @@ QPoint Widget::stringToPos(QString string)
     QPoint ret;
     ret.setX(QString(splitted[0]).toInt());
     ret.setY(QString(splitted[1]).toInt());
+    if (ret.x() < 0)
+      ret.setX(QDesktopWidget().screenGeometry(this).width() + ret.x());
+    if (ret.y() < 0)
+      ret.setY(QDesktopWidget().screenGeometry(this).height() + ret.y());
+
     return ret;
 }
 
