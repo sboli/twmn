@@ -14,7 +14,7 @@ class Widget : public QWidget
 {
     Q_OBJECT
 public:
-    Widget();
+    Widget(const char* wname);
     ~Widget();
 
 private slots:

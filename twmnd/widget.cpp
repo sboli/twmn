@@ -22,7 +22,7 @@
 #include "settings.h"
 #include "shortcutgrabber.h"
 
-Widget::Widget() : m_shortcutGrabber(this, m_settings)
+Widget::Widget(const char* wname) : m_settings(wname), m_shortcutGrabber(this, m_settings)
 {
     setWindowFlags(Qt::ToolTip);
     QPropertyAnimation* anim = new QPropertyAnimation(this);
