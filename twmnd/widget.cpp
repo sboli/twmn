@@ -25,6 +25,8 @@
 Widget::Widget(const char* wname) : m_settings(wname), m_shortcutGrabber(this, m_settings)
 {
     setWindowFlags(Qt::ToolTip);
+    setAttribute(Qt::WA_TranslucentBackground);
+    setWindowOpacity(m_settings.get("gui/opacity").toInt() / 100.0);
     QPropertyAnimation* anim = new QPropertyAnimation(this);
     anim->setTargetObject(this);
     m_animation.addAnimation(anim);
