@@ -11,6 +11,7 @@ Settings::Settings(QString file) : m_file(file)
     m_defaultSettings["main/enable_shortcuts"] = true;
     m_defaultSettings["gui/position"] = "top_right";
     m_defaultSettings["gui/screen"] = "";
+    m_defaultSettings["gui/opacity"] = 100;
     m_defaultSettings["gui/absolute_position"] = "";
     m_defaultSettings["gui/bounce"] = true;
     m_defaultSettings["gui/height"] = 18;
