@@ -8,7 +8,11 @@ A notification system for tiling window managers. `twmn` is two things:
 
 Notifications are shown in a one-line bar called the notification slide. They can be navigated through and activated with shortcuts.
 
+<<<<<<< HEAD
 ![](https://github.com/github/twmn/blob/master/screencast.gif)
+=======
+![](https://github.com/sboli/twmn/blob/master/screencast.gif)
+>>>>>>> 236283e5c4abe91a63c73bc4dccdca5a6cfe9b15
 
 See `twmn.conf` for more information.
 
