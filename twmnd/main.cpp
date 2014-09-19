@@ -12,6 +12,7 @@ void logOutput(QtMsgType type, const QMessageLogContext &context, const QString 
 #ifdef QT_NO_DEBUG_OUTPUT
     Q_UNUSED(type);
     Q_UNUSED(msg);
+    Q_UNUSED(context);
     return;
 #else
     std::cout << "[" << QTime::currentTime().toString("hh:mm:ss").toStdString() << "]";

@@ -365,7 +365,7 @@ void Widget::reverseTrigger()
         m_visible.setInterval(duration);
     else { // ensure its visible long enough to bounce
         if (bounce)
-            m_visible.setInterval(duration < minDuration ? minDuration : duration);
+            m_visible.setInterval((unsigned)duration < minDuration ? minDuration : duration);
         else
             m_visible.setInterval(duration);
     }
