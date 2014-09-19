@@ -8,7 +8,6 @@
 #include "settings.h"
 #include "message.h"
 #include "dbusinterface.h"
-#include "shortcutgrabber.h"
 
 class Widget : public QWidget
 {

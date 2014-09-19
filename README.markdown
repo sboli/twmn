@@ -8,6 +8,8 @@ A notification system for tiling window managers. `twmn` is two things:
 
 Notifications are shown in a one-line bar called the notification slide. They can be navigated through and activated with shortcuts.
 
+![](https://github.com/github/twmn/blob/master/screencast.gif)
+
 See `twmn.conf` for more information.
 
 
@@ -82,25 +84,6 @@ port=9797
 ; Program/command to play sound with.
 sound_command=  ;  Path to command. Leave empty for no sound.
 
-
-[shortcuts]
-; Modifiers shortcuts.
-modifiers=Alt+  ; Up to three modifiers. Use with the following shortcuts.
-
-; Shows the previous notification. Mouse wheel up does it too.
-previous=K
-
-; Shows the next notification. If a modification is manually shown it will not be displayed again
-; when twmnd process the notification stack. Mouse wheel up does it too.
-next=J
-
-; Activates the notification. Runs the command defined at activate_command.
-; Mouse left click activates it too.
-activate=Return
-
-; Hides all notifications. To hide the current notification, use the "next" key
-; instead. Mouse right click has the same effect.
-hide=X
 </pre>
 
 

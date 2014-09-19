@@ -20,7 +20,6 @@
 #include <QCursor>
 #include <QtX11Extras/QX11Info>
 #include "settings.h"
-#include "shortcutgrabber.h"
 
 Widget::Widget(const char* wname) : m_settings(wname)//, m_shortcutGrabber(this, m_settings)
 {
@@ -219,6 +218,7 @@ void Widget::updateBottomLeftAnimation(QVariant value)
             p = tmp;
     }
     setGeometry(p.x(), p.y()-height(), val, finalHeight);
+    //setGeometry(computeWidth()-val, p.y()-height(), computeWidth(), finalHeight);
     layout()->setSpacing(0);
     show();
 }
