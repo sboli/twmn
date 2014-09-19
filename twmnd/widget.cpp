@@ -18,11 +18,11 @@
 #include <QIcon>
 #include <QWheelEvent>
 #include <QCursor>
-#include <QX11Info>
+#include <QtX11Extras/QX11Info>
 #include "settings.h"
 #include "shortcutgrabber.h"
 
-Widget::Widget(const char* wname) : m_settings(wname), m_shortcutGrabber(this, m_settings)
+Widget::Widget(const char* wname) : m_settings(wname)//, m_shortcutGrabber(this, m_settings)
 {
     setWindowFlags(Qt::ToolTip);
     setAttribute(Qt::WA_TranslucentBackground);
@@ -36,7 +36,6 @@ Widget::Widget(const char* wname) : m_settings(wname), m_shortcutGrabber(this, m
     connect(&m_dbus, SIGNAL(messageReceived(Message)), this, SLOT(appendMessageToQueue(Message)));
     connect(&m_visible, SIGNAL(timeout()), this, SLOT(reverseStart()));
     m_visible.setSingleShot(true);
-    QAbstractEventDispatcher::instance()->setEventFilter(ShortcutGrabber::eventFilter);
     QHBoxLayout* l = new QHBoxLayout;
     l->setSizeConstraint(QLayout::SetNoConstraint);
     l->setMargin(0);
@@ -65,7 +64,7 @@ void Widget::init()
         return;
     }
     connect(&m_socket, SIGNAL(readyRead()), this, SLOT(onDataReceived()));
-    m_shortcutGrabber.loadShortcuts();
+   // m_shortcutGrabber.loadShortcuts();
 }
 
 void Widget::onDataReceived()
@@ -81,14 +80,29 @@ void Widget::onDataReceived()
         boost::property_tree::ptree& root = tree.get_child("root");
         boost::property_tree::ptree::iterator it;
         for (it = root.begin(); it != root.end(); ++it) {
-            //std::cout << it->first << " - " << it->second.get_value<std::string>() << std::endl;
+            std::cout << it->first << " - " << it->second.get_value<std::string>() << std::endl;
             m.data[QString::fromStdString(it->first)] = boost::optional<QVariant>(it->second.get_value<std::string>().c_str());
         }
     }
     catch (const std::exception& e) {
         std::cout << "ERROR : " << e.what() << std::endl;
     }
-    appendMessageToQueue(m);
+    if (m.data.contains("remote") && m.data["remote"]) { // a remote control action
+        processRemoteControl(qvariant_cast<QString>(m.data["remote"].get()));
+    }
+    else // A notification
+        appendMessageToQueue(m);
+}
+void Widget::processRemoteControl(QString command)
+{
+    if (command == "activate")
+        onActivate();
+    else if (command == "hide")
+        onHide();
+    else if (command == "next")
+        onNext();
+    else if (command == "previous")
+        onPrevious();
 }
 
 void Widget::appendMessageToQueue(const Message& msg)
@@ -130,7 +144,7 @@ void Widget::processMessageQueue()
     QString soundCommand = m.data["sc"]->toString();
     if (!soundCommand.isEmpty())
         QProcess::startDetached(soundCommand);
-    m_shortcutGrabber.enableShortcuts();
+   // m_shortcutGrabber.enableShortcuts();
 }
 
 void Widget::updateTopLeftAnimation(QVariant value)
@@ -367,7 +381,7 @@ void Widget::reverseStart()
         qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEasingCurve(QEasingCurve::Type(m_settings.get("gui/out_animation").toInt()));
         m_animation.setDirection(QAnimationGroup::Backward);
         m_animation.start();
-        m_shortcutGrabber.disableShortcuts();
+      //  m_shortcutGrabber.disableShortcuts();
     }
     else
         autoNext();
@@ -697,9 +711,12 @@ void Widget::onNext()
 
 void Widget::onActivate()
 {
-    Q_ASSERT(!m_messageQueue.isEmpty());
-    QProcess::startDetached(m_messageQueue.front().data["ac"]->toString());
-    m_visible.start();
+    if (!m_messageQueue.isEmpty()) {
+        if (m_messageQueue.front().data.contains("ac") && m_messageQueue.front().data["ac"]) {
+            QProcess::startDetached(m_messageQueue.front().data["ac"]->toString());
+            m_visible.start();
+        }
+    }
 }
 
 void Widget::onHide()

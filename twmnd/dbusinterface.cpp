@@ -161,11 +161,11 @@ void DBusInterface::Notify(DBusMessage *msg)
 
     Message m;
     if (strlen(body))
-        m.data["content"] = boost::optional<QVariant>(QString::fromAscii(body));
+        m.data["content"] = boost::optional<QVariant>(QString::fromUtf8(body));
     if (strlen(summary))
-        m.data[(m.data["content"] ? "title" : "content")] = boost::optional<QVariant>(QString::fromAscii(summary));
+        m.data[(m.data["content"] ? "title" : "content")] = boost::optional<QVariant>(QString::fromUtf8(summary));
     if (strlen(icon))
-        m.data["icon"] = boost::optional<QVariant>(QString::fromAscii(icon));
+        m.data["icon"] = boost::optional<QVariant>(QString::fromUtf8(icon));
     if (expires != -1) {
         m.data["duration"] = boost::optional<QVariant>(int(expires));
     }

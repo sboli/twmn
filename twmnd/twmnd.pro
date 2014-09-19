@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network widgets
 DEFINES += QT_NO_DEBUG_OUTPUT
 TARGET = twmnd
 TEMPLATE = app
@@ -19,11 +19,9 @@ INSTALLS += target
 SOURCES += main.cpp\
         widget.cpp \
     settings.cpp \
-    dbusinterface.cpp \
-    shortcutgrabber.cpp
+    dbusinterface.cpp
 
 HEADERS  += widget.h \
     settings.h \
     dbusinterface.h \
-    message.h \
-    shortcutgrabber.h
+    message.h

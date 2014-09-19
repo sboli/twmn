@@ -1,7 +1,7 @@
 #ifndef WIDGET_H
 #define WIDGET_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QUdpSocket>
 #include <QLabel>
 #include <QQueue>
@@ -65,6 +65,12 @@ public slots:
 
     void                    wheelEvent(QWheelEvent *e);
 
+    /*!
+     * \brief processRemoteControl Executes a command received from the client
+     * \param command the command to run [activate|hide|previous|next]
+     */
+    void                    processRemoteControl(QString command);
+
 private:
     /*!
       * \brief Get the final width of the slide after everything is set.
@@ -123,7 +129,7 @@ private:
     QParallelAnimationGroup m_animation;
     DBusInterface           m_dbus;
     QTimer                  m_visible;
-    ShortcutGrabber         m_shortcutGrabber;
+   // ShortcutGrabber         m_shortcutGrabber;
     QStack<Message>         m_previousStack;
     QPoint                  tmpBouncePos;
 };

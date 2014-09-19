@@ -101,13 +101,14 @@ int main(int argc, char** argv)
             ("id", po::value<int>(), "A message id. You should have given an id to the first message in order to modify it")
             ("aot", "Always on top. Specially on fullscreen applications, default.")
             ("ac", po::value<std::string>(), "A command to run when the notification is activated.")
+            ("remote", po::value<std::string>(), "Remote control for the daemon")
     ;
     try {
         po::variables_map vm;
         boost::property_tree::ptree tree;
         po::store(po::parse_command_line(argc, argv, desc), vm);
         if (vm.count("help")) {
-	    std::cout << desc << std::endl;
+         std::cout << desc << std::endl;
 	    return 0;
 	}
         const bool filled = populate_tree(vm, tree);

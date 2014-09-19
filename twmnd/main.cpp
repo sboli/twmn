@@ -1,11 +1,13 @@
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <QTextCodec>
+#include <QtGlobal>
 #include <QLocale>
 #include <QLibraryInfo>
 #include <QTranslator>
 #include "widget.h"
+#include "xcb/xcb.h"
 
-void logOutput(QtMsgType type, const char *msg)
+void logOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
 #ifdef QT_NO_DEBUG_OUTPUT
     Q_UNUSED(type);
@@ -18,13 +20,13 @@ void logOutput(QtMsgType type, const char *msg)
         std::cout << " " << msg;
         break;
     case QtWarningMsg:
-        std::cout << "[warning] " << msg;
+        std::cout << "[warning][" << context.file << '-' << context.line << "] " << msg.toStdString();
         break;
     case QtCriticalMsg:
-        std::cout << "[critical] " << msg;
+        std::cout << "[critical][" << context.file << '-' << context.line << "] " << msg.toStdString();
         break;
     case QtFatalMsg:
-        std::cout << "[fatal] " << msg;
+        std::cout << "[fatal][" << context.file << '-' << context.line << "] " <<  msg.toStdString();
         break;
     }
     std::cout << std::endl;
@@ -33,17 +35,14 @@ void logOutput(QtMsgType type, const char *msg)
 
 int main(int argc, char *argv[])
 {
-    qInstallMsgHandler(logOutput);
+    qInstallMessageHandler(logOutput);
     QApplication a(argc, argv);
     QApplication::setQuitOnLastWindowClosed(true);
     QApplication::setApplicationName("twmn");
     QPalette p = a.palette();
     p.setBrush(QPalette::Link, QBrush(QColor("black")));
     a.setPalette(p);
-    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-    QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
-
     const char* wname = "twmn";
     if (argc > 1) {
       wname = argv[1];
