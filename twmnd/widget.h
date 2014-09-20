@@ -131,6 +131,7 @@ private:
    // ShortcutGrabber         m_shortcutGrabber;
     QStack<Message>         m_previousStack;
     QPoint                  tmpBouncePos;
+    int                     m_computedWidth;
 };
 
 #endif // WIDGET_H

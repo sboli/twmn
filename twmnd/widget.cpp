@@ -157,7 +157,11 @@ void Widget::updateTopLeftAnimation(QVariant value)
         if (!tmp.isNull())
             p = tmp;
     }
-    setGeometry(p.x(), p.y(), value.toInt(), finalHeight);
+    //setGeometry(p.x(), p.y(), value.toInt(), finalHeight);
+    int width = computeWidth();
+    if (width != -1)
+        m_computedWidth = width;
+    setGeometry(value.toInt()-m_computedWidth, p.y(), m_computedWidth, finalHeight);
     layout()->setSpacing(0);
     show();
 }
@@ -217,8 +221,11 @@ void Widget::updateBottomLeftAnimation(QVariant value)
         if (!tmp.isNull())
             p = tmp;
     }
-    setGeometry(p.x(), p.y()-height(), val, finalHeight);
-    //setGeometry(computeWidth()-val, p.y()-height(), computeWidth(), finalHeight);
+    //setGeometry(p.x(), p.y()-height(), val, finalHeight);
+    int width = computeWidth();
+    if (width != -1)
+        m_computedWidth = width;
+    setGeometry(value.toInt()-m_computedWidth, p.y()-height(), m_computedWidth, finalHeight);
     layout()->setSpacing(0);
     show();
 }
@@ -389,6 +396,8 @@ void Widget::reverseStart()
 
 int Widget::computeWidth()
 {
+    if (m_messageQueue.isEmpty())
+        return -1;
     Message& m = m_messageQueue.front();
     QFont boldFont = font();
     boldFont.setBold(true);
