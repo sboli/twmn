@@ -17,6 +17,12 @@ public:
     ~Widget();
 
 private slots:
+    /*!
+     * \brief Receive signals from DBus. Each sent signal contains deserialized Message structure.
+     * \param DBusInterface which signals receiving a new DBus message.
+     */
+    void                    connectToDBus(const DBusInterface& dbus);
+
     void                    init();
     void                    onDataReceived();
     void                    appendMessageToQueue(const Message& msg);
@@ -126,9 +132,7 @@ private:
     QMap<QString, QLabel*>  m_contentView;
     QQueue<Message>         m_messageQueue;
     QParallelAnimationGroup m_animation;
-    DBusInterface           m_dbus;
     QTimer                  m_visible;
-   // ShortcutGrabber         m_shortcutGrabber;
     QStack<Message>         m_previousStack;
     QPoint                  tmpBouncePos;
     int                     m_computedWidth;

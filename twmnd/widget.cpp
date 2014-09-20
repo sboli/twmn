@@ -32,7 +32,6 @@ Widget::Widget(const char* wname) : m_settings(wname)//, m_shortcutGrabber(this,
     anim->setEasingCurve(QEasingCurve::Type(m_settings.get("gui/in_animation").toInt()));
     connect(anim, SIGNAL(finished()), this, SLOT(reverseTrigger()));
     connectForPosition(m_settings.get("gui/position").toString());
-    connect(&m_dbus, SIGNAL(messageReceived(Message)), this, SLOT(appendMessageToQueue(Message)));
     connect(&m_visible, SIGNAL(timeout()), this, SLOT(reverseStart()));
     m_visible.setSingleShot(true);
     QHBoxLayout* l = new QHBoxLayout;
@@ -53,6 +52,11 @@ Widget::Widget(const char* wname) : m_settings(wname)//, m_shortcutGrabber(this,
 
 Widget::~Widget()
 {
+}
+
+void Widget::connectToDBus(const DBusInterface& dbus)
+{
+    connect(&dbus, SIGNAL(messageReceived(Message)), this, SLOT(appendMessageToQueue(Message)));
 }
 
 void Widget::init()
@@ -211,7 +215,6 @@ void Widget::updateBottomLeftAnimation(QVariant value)
 {
     const int hend = QDesktopWidget().screenGeometry(this).height();
     const int finalHeight = getHeight();
-    const int val = value.toInt();
     QPoint p(0, hend);
     if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
         p = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).bottomLeft();
@@ -367,7 +370,7 @@ void Widget::reverseTrigger()
     }
     const bool bounce = m_settings.get("gui/bounce").toBool();
     const int duration = m_messageQueue.front().data["duration"]->toInt();
-    const unsigned int minDuration = 2010; // 2 x bounce and a little delay
+    const int minDuration = 2010; // 2 x bounce and a little delay
     if (duration == -1)
         m_visible.setInterval(duration);
     else { // ensure its visible long enough to bounce

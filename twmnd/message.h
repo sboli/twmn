@@ -8,7 +8,8 @@
 
 struct Message
 {
-    QMap<QString, boost::optional<QVariant> > data;
+    typedef boost::optional<QVariant> Data;
+    QMap<QString, Data> data;
 };
 
 #endif // MESSAGE_H

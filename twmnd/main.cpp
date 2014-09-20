@@ -6,6 +6,7 @@
 #include <QTranslator>
 #include "widget.h"
 #include "xcb/xcb.h"
+#include "dbusinterface.h"
 
 void logOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -48,6 +49,7 @@ int main(int argc, char *argv[])
     if (argc > 1) {
       wname = argv[1];
     }
+    DBusInterface dbus(&a);
     Widget w(wname);
     return a.exec();
 }
