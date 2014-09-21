@@ -507,7 +507,7 @@ void Widget::setupIcon()
         else if (pix.isNull())
             done = false;
         if (pix.height() > m.data["size"]->toInt())
-            pix = pix.scaled(m.data["size"]->toInt(), m.data["size"]->toInt());
+            pix = pix.scaled(m.data["size"]->toInt()-2, m.data["size"]->toInt()-2, Qt::KeepAspectRatio);
         m.data["icon"].reset(pix);
         m_contentView["icon"]->setPixmap(pix);
         m_contentView["icon"]->setMaximumWidth(9999);
