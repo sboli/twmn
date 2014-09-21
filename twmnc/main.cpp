@@ -101,7 +101,7 @@ int main(int argc, char** argv)
             ("id", po::value<int>(), "A message id. You should have given an id to the first message in order to modify it")
             ("aot", "Always on top. Specially on fullscreen applications, default.")
             ("ac", po::value<std::string>(), "A command to run when the notification is activated.")
-            ("remote", po::value<std::string>(), "Remote control for the daemon")
+            ("remote", po::value<std::string>(), "Remote control for the daemon. Can be either activate, next, previous or hide.")
     ;
     try {
         po::variables_map vm;
