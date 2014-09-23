@@ -17,11 +17,6 @@ public:
     ~Widget();
 
 private slots:
-    /*!
-     * \brief Receive signals from DBus. Each sent signal contains deserialized Message structure.
-     * \param DBusInterface which signals receiving a new DBus message.
-     */
-    void                    connectToDBus(const DBusInterface& dbus);
 
     void                    init();
     void                    onDataReceived();
@@ -75,6 +70,12 @@ public slots:
      * \param command the command to run [activate|hide|previous|next]
      */
     void                    processRemoteControl(QString command);
+
+    /*!
+     * \brief Receive signals from DBus. Each sent signal contains deserialized Message structure.
+     * \param DBusInterface which signals receiving a new DBus message.
+     */
+    void                    connectToDBus(const DBusInterface& dbus);
 
 private:
     /*!

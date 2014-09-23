@@ -51,5 +51,6 @@ int main(int argc, char *argv[])
     }
     DBusInterface dbus(&a);
     Widget w(wname);
+    w.connectToDBus(dbus);
     return a.exec();
 }
