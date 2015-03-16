@@ -138,7 +138,7 @@ private:
     QPoint                  tmpBouncePos;
     int                     m_computedWidth;
 
-    std::string                 m_activePositionSlot;
+    std::string             m_activePositionSlot;
 };
 
 #endif // WIDGET_H
