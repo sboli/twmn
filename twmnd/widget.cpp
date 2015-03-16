@@ -370,7 +370,11 @@ void Widget::reverseTrigger()
     }
     const bool bounce = m_settings.get("gui/bounce").toBool();
     const int duration = m_messageQueue.front().data["duration"]->toInt();
-    const int minDuration = 2010; // 2 x bounce and a little delay
+
+    const unsigned int minDuration =
+        m_settings.get("gui/in_animation_duration").toInt() +
+        m_settings.get("gui/out_animation_duration").toInt() + 10;
+
     if (duration == -1)
         m_visible.setInterval(duration);
     else { // ensure its visible long enough to bounce
@@ -387,9 +391,21 @@ void Widget::reverseStart()
     if (m_messageQueue.size() <= 1) {
         if (!m_messageQueue.isEmpty())
             m_messageQueue.pop_front();
-        qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setDuration(m_settings.get("gui/out_animation_duration").toInt());
-        qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEasingCurve(QEasingCurve::Type(m_settings.get("gui/out_animation").toInt()));
+        unsigned int duration = m_settings.get("gui/out_animation_duration").toInt();
+
+        QPropertyAnimation* anim = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0));
+        if (!anim)
+            return;
+
+        disconnect(anim, SIGNAL(valueChanged(QVariant)), this, m_activePositionSlot.c_str());
+
         m_animation.setDirection(QAnimationGroup::Backward);
+        anim->setEasingCurve(QEasingCurve::Type(m_settings.get("gui/out_animation").toInt()));
+        anim->setDuration(duration);
+        m_animation.setCurrentTime(duration);
+
+        connect(anim, SIGNAL(valueChanged(QVariant)), this, m_activePositionSlot.c_str());
+
         m_animation.start();
       //  m_shortcutGrabber.disableShortcuts();
     }
@@ -464,34 +480,37 @@ void Widget::connectForPosition(QString position)
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopCenterAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomCenterAnimation(QVariant)));
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateCenterAnimation(QVariant)));
+
     if (position == "top_left" || position == "tl") {
-        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopLeftAnimation(QVariant)));
+        m_activePositionSlot = SLOT(updateTopLeftAnimation(QVariant));
     }
     else if (position == "top_right" || position == "tr") {
-        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopRightAnimation(QVariant)));
+        m_activePositionSlot = SLOT(updateTopRightAnimation(QVariant));
     }
     else if (position == "bottom_right" || position == "br") {
-        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomRightAnimation(QVariant)));
+        m_activePositionSlot = SLOT(updateBottomRightAnimation(QVariant));
     }
     else if (position == "bottom_left" || position == "bl") {
-        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomLeftAnimation(QVariant)));
+        m_activePositionSlot = SLOT(updateBottomLeftAnimation(QVariant));
     }
     else if (position == "top_center" || position == "tc") {
-        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopCenterAnimation(QVariant)));
+        m_activePositionSlot = SLOT(updateTopCenterAnimation(QVariant));
     }
     else if (position == "bottom_center" || position == "bc") {
-        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBottomCenterAnimation(QVariant)));
+        m_activePositionSlot = SLOT(updateBottomCenterAnimation(QVariant));
     }
     else if (position == "center" || position == "c") {
-        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateCenterAnimation(QVariant)));
+        m_activePositionSlot = SLOT(updateCenterAnimation(QVariant));
     }
     else if (position == "below_cursor" || position == "bcur") {
-        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBelowCursorAnimation(QVariant)));
+        m_activePositionSlot = SLOT(updateBelowCursorAnimation(QVariant));
     }
     else {
         // top_right seems to be the classic case so fallback to it.
-        connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopRightAnimation(QVariant)));
+        m_activePositionSlot = SLOT(updateTopRightAnimation(QVariant));
     }
+
+    connect(anim, SIGNAL(valueChanged(QVariant)), this, m_activePositionSlot.c_str());
 }
 
 void Widget::setupIcon()
