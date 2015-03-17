@@ -13,6 +13,7 @@ Settings::Settings(QString file) : m_file(file)
     m_defaultSettings["gui/opacity"] = 100;
     m_defaultSettings["gui/absolute_position"] = "";
     m_defaultSettings["gui/bounce"] = true;
+    m_defaultSettings["gui/bounce_duration"] = 500;
     m_defaultSettings["gui/height"] = 18;
     m_defaultSettings["gui/font"] = "Sans";
     m_defaultSettings["gui/font_size"] = 13;

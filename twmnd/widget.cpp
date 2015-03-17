@@ -96,6 +96,7 @@ void Widget::onDataReceived()
     else // A notification
         appendMessageToQueue(m);
 }
+
 void Widget::processRemoteControl(QString command)
 {
     if (command == "activate")
@@ -120,10 +121,15 @@ void Widget::appendMessageToQueue(const Message& msg)
 
 void Widget::processMessageQueue()
 {
-    if (m_messageQueue.empty())
+    if (m_messageQueue.empty()) {
         return;
-    if (m_animation.state() == QAbstractAnimation::Running || (m_animation.totalDuration()-m_animation.currentTime()) < 50)
+    }
+
+    if (m_animation.state() == QAbstractAnimation::Running ||
+       (m_animation.totalDuration() - m_animation.currentTime()) < 50) {
         return;
+    }
+
     QFont boldFont = font();
     boldFont.setBold(true);
     Message& m = m_messageQueue.front();
@@ -305,13 +311,20 @@ void Widget::updateCenterAnimation(QVariant value)
 
 void Widget::startBounce()
 {
-    if (!m_settings.get("gui/bounce").toBool())
+    if (!m_settings.get("gui/bounce").toBool()) {
         return;
+    }
+
+    doneBounce();
+
     QPropertyAnimation* anim = new QPropertyAnimation(this);
     anim->setTargetObject(this);
     m_animation.addAnimation(anim);
+
     anim->setEasingCurve(QEasingCurve::OutQuad);
+    anim->setDuration(m_settings.get("gui/bounce_duration").toInt() * 0.25f);
     anim->setStartValue(0);
+
     QString position = m_messageQueue.front().data["pos"]->toString();
     if (position == "top_center" || position == "tc" ||
         position == "bottom_center" || position == "bc" ||
@@ -319,10 +332,13 @@ void Widget::startBounce()
         anim->setEndValue(height());
     else
         anim->setEndValue(40);
+
     tmpBouncePos = pos();
+
     anim->start();
-    connect(anim, SIGNAL(finished()), this, SLOT(unbounce()));
+
     connect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBounceAnimation(QVariant)));
+    connect(anim, SIGNAL(finished()), this, SLOT(unbounce()));
 }
 
 void Widget::unbounce()
@@ -334,17 +350,33 @@ void Widget::unbounce()
     connect(anim, SIGNAL(finished()), this, SLOT(doneBounce()));
     anim->setDirection(QAnimationGroup::Backward);
     anim->setEasingCurve(QEasingCurve::InBounce);
-    anim->setDuration(1000);
+    anim->setDuration(m_settings.get("gui/bounce_duration").toInt() * 0.75f);
     anim->start();
 }
 
 void Widget::doneBounce()
 {
-    m_animation.removeAnimation(qobject_cast<QPropertyAnimation*>(m_animation.animationAt(1)));
+    QPropertyAnimation* anim =
+        qobject_cast<QPropertyAnimation*>(m_animation.animationAt(1));
+
+    if(!anim) {
+        return;
+    }
+
+    disconnect(anim, SIGNAL(finished()), this, SLOT(unbounce()));
+    disconnect(anim, SIGNAL(finished()), this, SLOT(doneBounce()));
+    disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateBounceAnimation(QVariant)));
+
+    m_animation.removeAnimation(anim);
 }
 
 void Widget::updateBounceAnimation(QVariant value)
 {
+    if(m_messageQueue.empty()){
+        doneBounce();
+        return;
+    }
+
     QString position = m_messageQueue.front().data["pos"]->toString();
     if (position == "top_left" || position == "tl" ||
         position == "bottom_left" || position == "bl")
@@ -368,29 +400,32 @@ void Widget::reverseTrigger()
         QTimer::singleShot(30, this, SLOT(processMessageQueue()));
         return;
     }
-    const bool bounce = m_settings.get("gui/bounce").toBool();
+
+    const bool bounce  = m_settings.get("gui/bounce").toBool();
     const int duration = m_messageQueue.front().data["duration"]->toInt();
 
-    const unsigned int minDuration =
-        m_settings.get("gui/in_animation_duration").toInt() +
-        m_settings.get("gui/out_animation_duration").toInt() + 10;
+    const unsigned int minDuration = m_settings.get("gui/bounce_duration").toInt() + 10;
 
-    if (duration == -1)
-        m_visible.setInterval(duration);
-    else { // ensure its visible long enough to bounce
-        if (bounce)
+    if (duration == -1) {
+        m_visible.setInterval(minDuration);
+    } else { // ensure its visible long enough to bounce
+        if (bounce) {
             m_visible.setInterval((unsigned)duration < minDuration ? minDuration : duration);
-        else
+        } else {
             m_visible.setInterval(duration);
+        }
     }
+
     m_visible.start();
 }
 
 void Widget::reverseStart()
 {
     if (m_messageQueue.size() <= 1) {
-        if (!m_messageQueue.isEmpty())
+        if (!m_messageQueue.isEmpty()){
             m_messageQueue.pop_front();
+        }
+
         unsigned int duration = m_settings.get("gui/out_animation_duration").toInt();
 
         QPropertyAnimation* anim = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0));
@@ -546,7 +581,7 @@ void Widget::setupTitle()
         QString text = (m.data["icon"] ? " " : "") + m.data["title"]->toString() + " ";
         foreach (QString i, QStringList() << "\n" << "\r" << "<br/>" << "<br />")
             text.replace(i, " ");
-        m_contentView["title"]->setText(text);
+        m_contentView["title"]->setText(text + "| ");
         m_contentView["title"]->setFont(boldFont);
         m_contentView["title"]->setMaximumWidth(9999);
     }
