@@ -137,6 +137,8 @@ private:
     QStack<Message>         m_previousStack;
     QPoint                  tmpBouncePos;
     int                     m_computedWidth;
+
+    std::string             m_activePositionSlot;
 };
 
 #endif // WIDGET_H
