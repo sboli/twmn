@@ -126,7 +126,8 @@ void Widget::processMessageQueue()
     }
 
     if (m_animation.state() == QAbstractAnimation::Running ||
-       (m_animation.totalDuration() - m_animation.currentTime()) < 50) {
+            m_visible.isActive()){
+       //(m_animation.totalDuration() - m_animation.currentTime()) < 50) {
         return;
     }
 
@@ -396,7 +397,8 @@ void Widget::updateBounceAnimation(QVariant value)
 
 void Widget::reverseTrigger()
 {
-    if (m_animation.direction() == QAnimationGroup::Backward) {
+    if (m_animation.direction() == QAnimationGroup::Backward ||
+            m_messageQueue.isEmpty()) {
         QTimer::singleShot(30, this, SLOT(processMessageQueue()));
         return;
     }
@@ -421,8 +423,10 @@ void Widget::reverseTrigger()
 
 void Widget::reverseStart()
 {
+    //If last message, play hide animation.
     if (m_messageQueue.size() <= 1) {
         if (!m_messageQueue.isEmpty()){
+            doneBounce();
             m_messageQueue.pop_front();
         }
 
@@ -434,7 +438,7 @@ void Widget::reverseStart()
 
         disconnect(anim, SIGNAL(valueChanged(QVariant)), this, m_activePositionSlot.c_str());
 
-        m_animation.setDirection(QAnimationGroup::Backward);
+        anim->setDirection(QAnimationGroup::Backward);
         anim->setEasingCurve(QEasingCurve::Type(m_settings.get("gui/out_animation").toInt()));
         anim->setDuration(duration);
         m_animation.setCurrentTime(duration);
@@ -763,6 +767,7 @@ void Widget::onNext()
     m.data["manually_shown"] = boost::optional<QVariant>(true);
     m_previousStack.push(m);
     m_messageQueue.pop_front();
+    std::cout<<"Msgs left: "<<m_messageQueue.size()<<"\n";
     loadDefaults();
     setupFont();
     setupColors();

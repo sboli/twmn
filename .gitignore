@@ -2,3 +2,4 @@ Makefile
 bin/
 *.o
 moc_*
+*.swp
