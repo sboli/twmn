@@ -115,6 +115,7 @@ void Widget::appendMessageToQueue(const Message& msg)
         if (update(msg))
             return;
     }
+
     m_messageQueue.push_back(msg);
     QTimer::singleShot(30, this, SLOT(processMessageQueue()));
 }
@@ -126,7 +127,8 @@ void Widget::processMessageQueue()
     }
 
     if (m_animation.state() == QAbstractAnimation::Running ||
-       (m_animation.totalDuration() - m_animation.currentTime()) < 50) {
+            m_visible.isActive()) {
+       //(m_animation.totalDuration() - m_animation.currentTime()) < 50) {
         return;
     }
 
@@ -245,6 +247,7 @@ void Widget::updateTopCenterAnimation(QVariant value)
     const int finalHeight = getHeight();
     const int h = value.toInt() * finalHeight / finalWidth;
     const int wend = QDesktopWidget().screenGeometry(this).width();
+
     QPoint p1(wend, 0);
     QPoint p2(0, 0);
     if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
@@ -396,7 +399,8 @@ void Widget::updateBounceAnimation(QVariant value)
 
 void Widget::reverseTrigger()
 {
-    if (m_animation.direction() == QAnimationGroup::Backward) {
+    if (m_animation.direction() == QAnimationGroup::Backward ||
+            m_messageQueue.isEmpty()) {
         QTimer::singleShot(30, this, SLOT(processMessageQueue()));
         return;
     }
@@ -421,31 +425,43 @@ void Widget::reverseTrigger()
 
 void Widget::reverseStart()
 {
+    //If last message, play hide animation.
     if (m_messageQueue.size() <= 1) {
+        QPropertyAnimation* bounceAnim = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(1));
+        if(bounceAnim) {
+            if(bounceAnim->state() == QAbstractAnimation::Running){
+                return;
+            }
+        }
+
         if (!m_messageQueue.isEmpty()){
+            if(m_animation.animationAt(1)){
+                doneBounce();
+            }
             m_messageQueue.pop_front();
         }
 
         unsigned int duration = m_settings.get("gui/out_animation_duration").toInt();
 
         QPropertyAnimation* anim = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0));
-        if (!anim)
+        if (!anim) {
             return;
+        }
 
         disconnect(anim, SIGNAL(valueChanged(QVariant)), this, m_activePositionSlot.c_str());
 
-        m_animation.setDirection(QAnimationGroup::Backward);
+        anim->setDirection(QAnimationGroup::Backward);
         anim->setEasingCurve(QEasingCurve::Type(m_settings.get("gui/out_animation").toInt()));
         anim->setDuration(duration);
-        m_animation.setCurrentTime(duration);
+        anim->setCurrentTime(duration);
 
         connect(anim, SIGNAL(valueChanged(QVariant)), this, m_activePositionSlot.c_str());
 
-        m_animation.start();
-      //  m_shortcutGrabber.disableShortcuts();
-    }
-    else
+        anim->start();
+        //m_shortcutGrabber.disableShortcuts();
+    } else {
         autoNext();
+    }
 }
 
 int Widget::computeWidth()
@@ -715,10 +731,13 @@ QPoint Widget::stringToPos(QString string)
 
 void Widget::updateFinalWidth()
 {
-    if (m_messageQueue.empty())
+    if (m_messageQueue.empty()) {
         return;
+    }
+
     QString position = m_messageQueue.front().data["pos"]->toString();
     int width = computeWidth();
+
     qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->setEndValue(width);
     if (position == "top_left" || position == "tl")
         updateTopLeftAnimation(width);
@@ -826,6 +845,11 @@ void Widget::wheelEvent(QWheelEvent *e)
 
 std::size_t Widget::getHeight()
 {
-    return m_animation.direction() == QAbstractAnimation::Forward && m_messageQueue.size() ?
-                m_messageQueue.front().data["size"]->toInt() : height();
+    QPropertyAnimation* anim = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0));
+    if(anim->direction() == QAbstractAnimation::Forward
+            && !m_messageQueue.empty()) {
+        return m_messageQueue.front().data["size"]->toInt();
+    } else {
+        return height();
+    }
 }

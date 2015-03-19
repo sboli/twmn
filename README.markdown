@@ -58,10 +58,13 @@ in_animation_duration=1000 ; in milliseconds
 out_animation=13
 
 ; The out animation's duration
-out_animation_duration=1000
+out_animation_duration=1000 ; in milliseconds
 
 ; Enable or disable notification bounce when changing notification
 bounce=true  ; true or false
+
+; Change bounce duration
+bounce_duration=500 ; in milliseconds
 
 [icons]
 ; An icon. You can add as many as you want.
