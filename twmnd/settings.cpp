@@ -17,6 +17,7 @@ Settings::Settings(QString file) : m_file(file)
     m_defaultSettings["gui/height"] = 18;
     m_defaultSettings["gui/font"] = "Sans";
     m_defaultSettings["gui/font_size"] = 13;
+    m_defaultSettings["gui/font_variant"] = "medium";
     m_defaultSettings["gui/foreground_color"] = "#999999";
     m_defaultSettings["gui/background_color"] = "#000000";
     m_defaultSettings["gui/always_on_top"] = true;
