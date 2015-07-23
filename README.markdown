@@ -38,6 +38,12 @@ font=Sans
 ; Font size.
 font_size=13  ; In pixel.
 
+; Font variation.
+; accepted values are:
+; oblique, italic, ultra-light, light, medium, semi-bold, bold, ultra-bold, heavy, ultra-condensed,
+; extra-condensed, condensed, semi-condensed, semi-expanded, expanded, extra-expanded, ultra-expanded.
+font_variant=medium
+
 ; Text color.
 foreground_color=white  ; RBG hex and keywords (eg. lightgray) are supported.
 

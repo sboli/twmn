@@ -500,6 +500,41 @@ void Widget::setupFont()
         font.setPixelSize(m.data["fs"]->toInt());
         font.setFamily(name);
     }
+    QString ss( m.data["fv"]->toString() );
+    if (ss == "oblique")
+		font.setStyle( QFont::StyleOblique );
+	else if (ss == "italic")
+		font.setStyle( QFont::StyleItalic );
+	else if (ss == "ultra-light")
+		font.setWeight( 13 );
+	else if (ss == "light")
+		font.setWeight( QFont::Light );
+	else if (ss == "medium")
+		font.setWeight( 50 );
+	else if (ss == "semi-bold")
+		font.setWeight( QFont::DemiBold );
+	else if (ss == "bold")
+		font.setWeight( QFont::Bold );
+	else if (ss == "ultra-bold")
+		font.setWeight( QFont::Black );
+	else if (ss == "heavy")
+		font.setWeight( 99 );
+	else if (ss == "ultra-condensed")
+		font.setStretch( QFont::UltraCondensed );
+	else if (ss == "extra-condensed")
+		font.setStretch( QFont::ExtraCondensed );
+	else if (ss == "condensed")
+		font.setStretch( QFont::Condensed );
+	else if (ss == "semi-condensed")
+		font.setStretch( QFont::SemiCondensed );
+	else if (ss == "semi-expanded")
+		font.setStretch( QFont::SemiExpanded );
+	else if (ss == "expanded")
+		font.setStretch( QFont::Expanded );
+	else if (ss == "extra-expanded")
+		font.setStretch( QFont::ExtraExpanded );
+	else if (ss == "ultra-expanded")
+		font.setStretch( QFont::UltraExpanded );
     QApplication::setFont(font);
 }
 
@@ -648,6 +683,8 @@ void Widget::loadDefaults()
         m.data["fs"] = boost::optional<QVariant>(s->get("gui/font_size"));
     if (!m.data["fn"])
         m.data["fn"] = boost::optional<QVariant>(s->get("gui/font"));
+    if (!m.data["fv"])
+        m.data["fv"] = boost::optional<QVariant>(s->get("gui/font_variant"));
     if (!m.data["pos"])
         m.data["pos"] = boost::optional<QVariant>(s->get("gui/position"));
     if (!m.data["size"])
