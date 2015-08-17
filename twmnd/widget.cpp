@@ -836,8 +836,14 @@ void Widget::onActivate()
     if (!m_messageQueue.isEmpty()) {
         if (m_messageQueue.front().data.contains("ac") && m_messageQueue.front().data["ac"]) {
             QProcess::startDetached(m_messageQueue.front().data["ac"]->toString());
-            m_visible.start();
+            m_messageQueue.front().data["ac"] = "";
         }
+    }
+
+    if(m_messageQueue.size() > 1) {
+        onNext();
+    } else {
+        onHide();
     }
 }
 
