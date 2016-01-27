@@ -62,7 +62,8 @@ void Widget::connectToDBus(const DBusInterface& dbus)
 void Widget::init()
 {
     int port = m_settings.get("main/port").toInt();
-    if (!m_socket.bind(QHostAddress::Any, port)) {
+    QHostAddress host = QHostAddress(m_settings.get("main/host").toString());
+    if (!m_socket.bind(host, port)) {
         qCritical() << "Unable to listen port" << port;
         return;
     }
