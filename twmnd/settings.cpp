@@ -4,6 +4,7 @@
 Settings::Settings(QString file) : m_file(file)
 {
     m_defaultSettings["main/port"] = 9797;
+    m_defaultSettings["main/host"] = "127.0.0.1";
     m_defaultSettings["main/sound_command"] = "";
     m_defaultSettings["main/activate_command"] = "";
     m_defaultSettings["main/duration"] = "3000";

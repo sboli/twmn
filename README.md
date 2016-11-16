@@ -87,6 +87,9 @@ duration=3000  ; In millisecond.
 ; Enable or disable shortcuts.
 enable_shortcuts=true  ; true or false.
 
+; Host address to listen on for notifications.
+host=127.0.0.1
+
 ; UDP port used for notifications.
 port=9797
 
