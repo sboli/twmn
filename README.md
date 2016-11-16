@@ -106,7 +106,7 @@ For [Arch Linux](http://www.archlinux.org/) users, `twmn` is [on the AUR](https:
 
 Otherwise you can install `twmnd` and `twmnc` manually:
 
-1. install `boost` and `qt` if they weren't before
+1. install `boost` and `qt` if they weren't before, including the `widgets` and `x11extras` qt libraries
 2. `git clone https://github.com/sboli/twmn.git` to get `twmn`
 3. `cd twmn/`
 4. `qmake` to generate a Makefile
