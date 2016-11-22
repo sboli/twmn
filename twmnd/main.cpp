@@ -7,6 +7,12 @@
 #include "widget.h"
 #include "xcb/xcb.h"
 #include "dbusinterface.h"
+#include <iostream>
+
+
+#ifndef VERSION
+#define VERSION "1.2"
+#endif
 
 void logOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -37,6 +43,7 @@ void logOutput(QtMsgType type, const QMessageLogContext &context, const QString 
 
 int main(int argc, char *argv[])
 {
+    std::cout << "Starting twmnd version " << VERSION << std::endl;
     qInstallMessageHandler(logOutput);
     QApplication a(argc, argv);
     QApplication::setQuitOnLastWindowClosed(true);

@@ -11,6 +11,10 @@
 #include <exception>
 #include <unistd.h>
 
+#ifndef VERSION
+#define VERSION "1.2"
+#endif
+
 const std::string   DEFAULT_HOST = "127.0.0.1";
 const int           DEFAULT_PORT = 9797;
 
@@ -80,7 +84,7 @@ void send_tree(const boost::program_options::variables_map& vm, const boost::pro
 int main(int argc, char** argv)
 {
     namespace po = boost::program_options;
-    po::options_description desc("Options");
+    po::options_description desc(std::string("twmn client version ") + VERSION + "\n Options");
     desc.add_options()
             ("help,h", "Show this help")
             ("icon,i", po::value<std::string>(), "The icon to use, either a predefined symbol"
@@ -102,6 +106,7 @@ int main(int argc, char** argv)
             ("aot", "Always on top. Specially on fullscreen applications, default.")
             ("ac", po::value<std::string>(), "A command to run when the notification is activated.")
             ("remote", po::value<std::string>(), "Remote control for the daemon. Can be either activate, next, previous or hide.")
+            ("version", po::value<std::string>(), "Show the version number.")
     ;
     try {
         po::variables_map vm;
