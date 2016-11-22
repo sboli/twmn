@@ -443,6 +443,8 @@ void Widget::reverseStart()
         }
 
         unsigned int duration = m_settings.get("gui/out_animation_duration").toInt();
+        if (duration <= 30)
+            duration = 30;
 
         QPropertyAnimation* anim = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0));
         if (!anim) {
@@ -558,6 +560,8 @@ void Widget::connectForPosition(QString position)
     if (!anim)
         return;
     int duration = m_settings.get("gui/in_animation_duration").toInt();
+    if (duration <= 30)
+        duration = 30;
     if (anim->duration() != duration)
         anim->setDuration(duration);
     disconnect(anim, SIGNAL(valueChanged(QVariant)), this, SLOT(updateTopLeftAnimation(QVariant)));
