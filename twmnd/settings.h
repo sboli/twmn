@@ -39,9 +39,9 @@ public:
     bool                has(QString setting);
 
     /*!
-      * \brief Sauvegarde les paramètres.
+      * \brief Create default settings
       */
-    void                save();
+    void                createDefaults();
 
     /*!
       * \brief Complète cette instance avec les donnés de s, sans écraser les données de cette instance.
