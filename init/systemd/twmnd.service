@@ -1,0 +1,11 @@
+[Unit]
+Description=twmn server
+
+[Service]
+Type=simple
+StandardOutput=null
+Restart=on-failure
+ExecStart=/usr/bin/twmnd
+
+[Install]
+WantedBy=default.target
