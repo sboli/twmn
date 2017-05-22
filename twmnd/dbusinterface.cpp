@@ -1,6 +1,10 @@
 #include "dbusinterface.h"
 #include <QDebug>
 #include <QTimer>
+#include <stdlib.h>
+#include "settings.h"
+#include <iostream>
+#include <string>
 
 DBusInterface::DBusInterface(QObject* parent) :
     QDBusAbstractAdaptor(parent),
@@ -48,9 +52,14 @@ void DBusInterface::Notify(
     int timeout,
     unsigned int& return_id)
 {
-    Q_UNUSED(appName);
     Q_UNUSED(actions);
     Q_UNUSED(hints);
+    
+    //hijack this function to set 'demands attention' attribute on the app that sent the notification
+    //(on i3, this makes its parent workspace red in the statusbar. ymmv.)
+    int status = system(("wmctrl -b add,demands_attention -r " + appName.toStdString()).c_str());
+    if (status)        
+        std::cout << "Error: can't set attention" << std::endl;  
 
     Message msg;
     if (!body.isEmpty())
