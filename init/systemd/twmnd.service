@@ -1,5 +1,6 @@
 [Unit]
 Description=twmn server
+After=graphical.target
 
 [Service]
 Type=simple
