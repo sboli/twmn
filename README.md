@@ -54,6 +54,10 @@ height=18  ; In pixel.
 position=top_right  ; Accepted values: top_right (tr), top_left (tl), bottom_right (br),
                     ; bottom_left (bl), top_center (tc), bottom_center (bc), center (c).
 
+; moves the position of the slide in +/- pixels on the x or y axis (e.g. "+50" or "-100")
+offset_x=+0 ; default is 0
+offset_y=+0 ; default is 0
+
 ; The animation to use when the slide appear
 in_animation=38 ; see https://doc.qt.io/qt-5/qeasingcurve.html#Type-enum for types
 

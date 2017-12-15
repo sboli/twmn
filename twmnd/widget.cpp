@@ -174,7 +174,9 @@ void Widget::updateTopLeftAnimation(QVariant value)
     int width = computeWidth();
     if (width != -1)
         m_computedWidth = width;
-    setGeometry(value.toInt()-m_computedWidth, p.y(), m_computedWidth, finalHeight);
+    int offset_x = m_settings.get("gui/offset_x").toInt();
+    int offset_y = m_settings.get("gui/offset_y").toInt();
+    setGeometry(value.toInt()-m_computedWidth+offset_x, p.y()+offset_y, m_computedWidth, finalHeight);
     layout()->setSpacing(0);
     show();
 }
@@ -194,7 +196,9 @@ void Widget::updateTopRightAnimation(QVariant value)
           p = tmp;
         }
     }
-    setGeometry(p.x()-val, p.y(), val, finalHeight);
+    int offset_x = m_settings.get("gui/offset_x").toInt();
+    int offset_y = m_settings.get("gui/offset_y").toInt();
+    setGeometry(p.x()-val+offset_x, p.y()+offset_y, val, finalHeight);
     layout()->setSpacing(0);
     show();
 }
@@ -215,7 +219,9 @@ void Widget::updateBottomRightAnimation(QVariant value)
         if (!tmp.isNull())
             p = tmp;
     }
-    setGeometry(p.x()-val, p.y()-height(), val, finalHeight);
+    int offset_x = m_settings.get("gui/offset_x").toInt();
+    int offset_y = m_settings.get("gui/offset_y").toInt();
+    setGeometry(p.x()-val+offset_x, p.y()-height()+offset_y, val, finalHeight);
     layout()->setSpacing(0);
     show();
 }
@@ -237,7 +243,9 @@ void Widget::updateBottomLeftAnimation(QVariant value)
     int width = computeWidth();
     if (width != -1)
         m_computedWidth = width;
-    setGeometry(value.toInt()-m_computedWidth, p.y()-height(), m_computedWidth, finalHeight);
+    int offset_x = m_settings.get("gui/offset_x").toInt();
+    int offset_y = m_settings.get("gui/offset_y").toInt();
+    setGeometry(value.toInt()-m_computedWidth, p.y()-height()+offset_x, m_computedWidth+offset_y, finalHeight);
     layout()->setSpacing(0);
     show();
 }
@@ -260,7 +268,10 @@ void Widget::updateTopCenterAnimation(QVariant value)
         if (!tmp.isNull())
             p1 = tmp;
     }
-    setGeometry((p2.x() - p1.x())/2 - finalWidth/2 + p1.x(), p1.y(), finalWidth, h);
+
+    int offset_x = m_settings.get("gui/offset_x").toInt();
+    int offset_y = m_settings.get("gui/offset_y").toInt();
+    setGeometry(((p2.x() - p1.x())/2 - finalWidth/2 + p1.x())+offset_x, p1.y()+offset_y, finalWidth, h);
     layout()->setSpacing(0);
     show();
 }
@@ -284,7 +295,9 @@ void Widget::updateBottomCenterAnimation(QVariant value)
         if (!tmp.isNull())
             p1 = tmp;
     }
-    setGeometry((p2.x() - p1.x())/2 - finalWidth/2 + p1.x(), p1.y()-h, finalWidth, h);
+    int offset_x = m_settings.get("gui/offset_x").toInt();
+    int offset_y = m_settings.get("gui/offset_y").toInt();
+    setGeometry(((p2.x() - p1.x())/2 - finalWidth/2 + p1.x())+offset_x, p1.y()-h+offset_y, finalWidth, h);
     layout()->setSpacing(0);
     show();
 }
@@ -308,7 +321,9 @@ void Widget::updateCenterAnimation(QVariant value)
         if (!tmp.isNull())
             p1 = tmp;
     }
-    setGeometry((p2.x() - p1.x())/2 - value.toInt()/2 + p1.x(), p1.y()/2 - h/2, value.toInt(), h);
+    int offset_x = m_settings.get("gui/offset_x").toInt();
+    int offset_y = m_settings.get("gui/offset_y").toInt();
+    setGeometry(((p2.x() - p1.x())/2 - value.toInt()/2 + p1.x())+offset_x, (p1.y()/2 - h/2)+offset_y, value.toInt(), h);
     layout()->setSpacing(0);
     show();
 }
