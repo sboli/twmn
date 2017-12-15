@@ -72,6 +72,9 @@ bounce=true  ; true or false
 ; Change bounce duration
 bounce_duration=500 ; in milliseconds
 
+; If the character length is more then max_length the text is cut off and "..." is appended
+max_length = -1 ; default is -1 (which means: don't cut off)
+
 [icons]
 ; An icon. You can add as many as you want.
 NAME=  ; Path to image file. NAME being the icon's custom name.

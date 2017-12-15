@@ -637,6 +637,7 @@ void Widget::setupTitle()
         QString text = (m.data["icon"] ? " " : "") + m.data["title"]->toString() + " ";
         foreach (QString i, QStringList() << "\n" << "\r" << "<br/>" << "<br />")
             text.replace(i, " ");
+
         m_contentView["title"]->setText(text + "| ");
         m_contentView["title"]->setFont(boldFont);
         m_contentView["title"]->setMaximumWidth(9999);
@@ -654,6 +655,11 @@ void Widget::setupContent()
         QString text = (m.data["icon"] && !m.data["title"] ? " " : "") + m.data["content"]->toString() + " ";
         foreach (QString i, QStringList() << "\n" << "\r" << "<br/>" << "<br />")
             text.replace(i, " ");
+        int max_length = m_settings.get("gui/max_length").toInt();
+        if (max_length != -1 && text.size() >= max_length) {
+            text.resize(max_length);
+            text.append("...");
+        }
         m_contentView["text"]->setText(text);
         m_contentView["text"]->setMaximumWidth(9999);
     }
