@@ -26,6 +26,7 @@ Settings::Settings(QString file) : m_file(file)
     m_defaultSettings["gui/in_animation_duration"] = 1000;
     m_defaultSettings["gui/out_animation"] = 13;
     m_defaultSettings["gui/out_animation_duration"] = 1000;
+    m_defaultSettings["gui/max_length"] = -1;
     m_defaultSettings["icons/critical_icon"] = "";
     m_defaultSettings["icons/warning_icon"] = "";
     m_defaultSettings["icons/info_icon"] = "";
