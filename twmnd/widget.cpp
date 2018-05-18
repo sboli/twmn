@@ -137,7 +137,7 @@ void Widget::processMessageQueue()
     Message& m = m_messageQueue.front();
     loadDefaults();
     if (m.data["aot"]->toBool()) {
-        setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::X11BypassWindowManagerHint);
+        setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::BypassWindowManagerHint);
         raise();
     }
     setupFont();
