@@ -18,7 +18,6 @@
 #include <QIcon>
 #include <QWheelEvent>
 #include <QCursor>
-#include <QtX11Extras/QX11Info>
 #include "settings.h"
 
 Widget::Widget(const char* wname) : m_settings(wname)//, m_shortcutGrabber(this, m_settings)
