@@ -18,7 +18,6 @@
 #include <QIcon>
 #include <QWheelEvent>
 #include <QCursor>
-#include <QtX11Extras/QX11Info>
 #include "settings.h"
 
 Widget::Widget(const char* wname) : m_settings(wname)//, m_shortcutGrabber(this, m_settings)
@@ -138,7 +137,7 @@ void Widget::processMessageQueue()
     Message& m = m_messageQueue.front();
     loadDefaults();
     if (m.data["aot"]->toBool()) {
-        setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::X11BypassWindowManagerHint);
+        setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::BypassWindowManagerHint);
         raise();
     }
     setupFont();

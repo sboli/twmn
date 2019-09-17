@@ -5,7 +5,6 @@
 #include <QLibraryInfo>
 #include <QTranslator>
 #include "widget.h"
-#include "xcb/xcb.h"
 #include "dbusinterface.h"
 #include <iostream>
 

@@ -10,7 +10,6 @@ TARGET = twmnd
 TEMPLATE = app
 CONFIG += debug
 DESTDIR = ../bin/
-LIBS += -lX11 -lXext
 QMAKE_CXXFLAGS += -Wall -Werror -pedantic -Wno-long-long
 
 target.path+=/usr/local/bin
