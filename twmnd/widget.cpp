@@ -220,7 +220,7 @@ void Widget::updateBottomRightAnimation(QVariant value)
     }
     int offset_x = m_settings.get("gui/offset_x").toInt();
     int offset_y = m_settings.get("gui/offset_y").toInt();
-    setGeometry(p.x()-val+offset_x, p.y()-height()+offset_y, val, finalHeight);
+    setGeometry(p.x()-val+offset_x, p.y()-height()-offset_y, val, finalHeight);	// Fixed inverted offset_y.
     layout()->setSpacing(0);
     show();
 }
@@ -244,7 +244,9 @@ void Widget::updateBottomLeftAnimation(QVariant value)
         m_computedWidth = width;
     int offset_x = m_settings.get("gui/offset_x").toInt();
     int offset_y = m_settings.get("gui/offset_y").toInt();
-    setGeometry(value.toInt()-m_computedWidth, p.y()-height()+offset_x, m_computedWidth+offset_y, finalHeight);
+    //setGeometry(value.toInt()-m_computedWidth, p.y()-height()+offset_y, m_computedWidth+offset_x, finalHeight);	// Fixed inverted offsets.
+    setGeometry(value.toInt()-m_computedWidth, p.y()-height()-offset_y, m_computedWidth+offset_x, finalHeight);	// Fixed inverted offsets and offset_y.
+	/* Implementing offsets like that means the widget will be constantly exposed. Consider applying offsets to the calculated screen corner. p.rx()? */
     layout()->setSpacing(0);
     show();
 }
