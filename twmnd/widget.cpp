@@ -392,7 +392,7 @@ void Widget::doneBounce()
 
 void Widget::updateBounceAnimation(QVariant value)
 {
-    if(m_messageQueue.empty()){
+    if(m_messageQueue.empty()) {
         doneBounce();
         return;
     }
@@ -821,6 +821,7 @@ void Widget::updateFinalWidth()
 
 void Widget::onPrevious()
 {
+    m_animation.stop();	// Prevents bar sticking open if hidden while opening.
     m_visible.start();
     if (m_previousStack.size() < 1)
         return;
@@ -838,6 +839,7 @@ void Widget::onPrevious()
 
 void Widget::onNext()
 {
+    m_animation.stop();	// Prevents bar sticking open if hidden while opening.
     m_visible.start();
     if (m_messageQueue.size() < 2)
         return;
@@ -860,6 +862,8 @@ void Widget::onNext()
 
 void Widget::onActivate()
 {
+	/* I did not implement sticking protection here because it might be desirable. */
+
     if (!m_messageQueue.isEmpty()) {
         if (m_messageQueue.front().data.contains("ac") && m_messageQueue.front().data["ac"]) {
             QProcess::startDetached(m_messageQueue.front().data["ac"]->toString());
@@ -876,6 +880,7 @@ void Widget::onActivate()
 
 void Widget::onHide()
 {
+    m_animation.stop();	// Prevents bar sticking open if hidden while opening.
     m_messageQueue.clear();
     m_visible.setInterval(2);
     m_visible.start();
