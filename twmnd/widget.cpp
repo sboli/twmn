@@ -472,7 +472,7 @@ void Widget::reverseStart()
         anim->setDirection(QAnimationGroup::Backward);
         anim->setEasingCurve(QEasingCurve::Type(m_settings.get("gui/out_animation").toInt()));
         anim->setDuration(duration);
-        anim->setCurrentTime(duration);
+        //anim->setCurrentTime(duration);
 
         connect(anim, SIGNAL(valueChanged(QVariant)), this, m_activePositionSlot.c_str());
 
@@ -821,10 +821,9 @@ void Widget::updateFinalWidth()
 
 void Widget::onPrevious()
 {
-    m_animation.stop();	// Prevents bar sticking open if hidden while opening.
-    m_visible.start();
     if (m_previousStack.size() < 1)
         return;
+    m_visible.start();	// Don't run this if returning.
     Message m = m_previousStack.pop();
     m_messageQueue.push_front(m);
     loadDefaults();
@@ -839,10 +838,9 @@ void Widget::onPrevious()
 
 void Widget::onNext()
 {
-    m_animation.stop();	// Prevents bar sticking open if hidden while opening.
-    m_visible.start();
     if (m_messageQueue.size() < 2)
         return;
+    m_visible.start();	// Don't run this if returning.
     Message m = m_messageQueue.front();
     boost::optional<QVariant> tmpManual = m.data["manually_shown"];
     m.data["manually_shown"] = boost::optional<QVariant>(true);
@@ -880,10 +878,12 @@ void Widget::onActivate()
 
 void Widget::onHide()
 {
-    m_animation.stop();	// Prevents bar sticking open if hidden while opening.
+    m_animation.stop();
     m_messageQueue.clear();
-    m_visible.setInterval(2);
-    m_visible.start();
+    if (m_visible.isActive()) {
+        m_visible.setInterval(2);
+        //reverseStart();
+    }
 }
 
 void Widget::autoNext()
