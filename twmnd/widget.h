@@ -127,6 +127,8 @@ private:
 
     inline std::size_t      getHeight();
 
+    QRect                   getScreenRect();
+
 private:
     Settings                m_settings;
     QUdpSocket              m_socket;

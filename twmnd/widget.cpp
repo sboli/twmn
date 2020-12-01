@@ -14,6 +14,7 @@
 #include <QPixmap>
 #include <QPainter>
 #include <QTextDocument>
+#include <QScreen>
 #include <QShortcut>
 #include <QIcon>
 #include <QWheelEvent>
@@ -158,12 +159,17 @@ void Widget::processMessageQueue()
    // m_shortcutGrabber.enableShortcuts();
 }
 
+QRect Widget::getScreenRect()
+{
+    return QGuiApplication::screens().at(m_settings.get("gui/screen").toInt())->geometry();
+}
+
 void Widget::updateTopLeftAnimation(QVariant value)
 {
     const int finalHeight = getHeight();
     QPoint p(0, 0);
     if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
-        p = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).topLeft();
+        p = getScreenRect().topLeft();
     } else if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
         if (!tmp.isNull())
@@ -187,7 +193,7 @@ void Widget::updateTopRightAnimation(QVariant value)
     const int finalHeight = getHeight();
     QPoint p(end, 0);
     if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
-        p = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).topRight();
+        p = getScreenRect().topRight();
         ++p.rx();
     } else if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
@@ -210,7 +216,7 @@ void Widget::updateBottomRightAnimation(QVariant value)
     const int val = value.toInt();
     QPoint p(wend, hend);
     if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
-        p = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).bottomRight();
+        p = getScreenRect().bottomRight();
         ++p.rx();
         ++p.ry();
     } else if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
@@ -231,7 +237,7 @@ void Widget::updateBottomLeftAnimation(QVariant value)
     const int finalHeight = getHeight();
     QPoint p(0, hend);
     if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
-        p = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).bottomLeft();
+        p = getScreenRect().bottomLeft();
         ++p.ry();
     } else if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
@@ -259,9 +265,9 @@ void Widget::updateTopCenterAnimation(QVariant value)
     QPoint p1(wend, 0);
     QPoint p2(0, 0);
     if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
-        p1 = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).topRight();
+        p1 = getScreenRect().topRight();
         ++p1.rx();
-        p2 = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).topLeft();
+        p2 = getScreenRect().topLeft();
     } else if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
         if (!tmp.isNull())
@@ -285,10 +291,10 @@ void Widget::updateBottomCenterAnimation(QVariant value)
     QPoint p1(wend, hend);
     QPoint p2(0, 0);
     if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
-        p1 = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).bottomRight();
+        p1 = getScreenRect().bottomRight();
         ++p1.rx();
         ++p1.ry();
-        p2 = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).topLeft();
+        p2 = getScreenRect().topLeft();
     } else if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
         if (!tmp.isNull())
@@ -311,10 +317,10 @@ void Widget::updateCenterAnimation(QVariant value)
     QPoint p1(wend, hend);
     QPoint p2(0, 0);
     if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
-        p1 = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).bottomRight();
+        p1 = getScreenRect().bottomRight();
         ++p1.rx();
         ++p1.ry();
-        p2 = QDesktopWidget().screenGeometry(m_settings.get("gui/screen").toInt()).topLeft();
+        p2 = getScreenRect().topLeft();
     } else if (m_settings.has("gui/absolute_position") && !m_settings.get("gui/absolute_position").toString().isEmpty()) {
         QPoint tmp = stringToPos(m_settings.get("gui/absolute_position").toString());
         if (!tmp.isNull())
@@ -490,7 +496,7 @@ int Widget::computeWidth()
     boldFont.setBold(true);
     int width = 0;
     QString text = m_contentView["text"]->text();
-    width += QFontMetrics(boldFont).width(m_contentView["title"]->text());
+    width += QFontMetrics(boldFont).boundingRect(m_contentView["title"]->text()).width();
     if (Qt::mightBeRichText(text)) {
         QTextDocument doc;
         doc.setUseDesignMetrics(true);
@@ -499,9 +505,9 @@ int Widget::computeWidth()
         width += doc.idealWidth();
     }
     else
-        width += QFontMetrics(font()).width(text);
+        width += QFontMetrics(font()).boundingRect(text).width();
     if (m.data["icon"])
-        width += m_contentView["icon"]->pixmap()->width();
+        width += m_contentView["icon"]->pixmap(Qt::ReturnByValue).width();
     return width;
 }
 
@@ -510,13 +516,8 @@ void Widget::setupFont()
     Message& m = m_messageQueue.front();
     QFont font;
     QString name = m.data["fn"]->toString();
-    // Trick to detect a font in XFD format.
-    if (name.count('-') >= 4)
-        font.setRawName(name);
-    else {
-        font.setPixelSize(m.data["fs"]->toInt());
-        font.setFamily(name);
-    }
+    font.setPixelSize(m.data["fs"]->toInt());
+    font.setFamily(name);
     QString ss( m.data["fv"]->toString() );
     if (ss == "oblique")
 		font.setStyle( QFont::StyleOblique );
@@ -904,9 +905,11 @@ void Widget::mousePressEvent(QMouseEvent *e)
 
 void Widget::wheelEvent(QWheelEvent *e)
 {
-    if (e->delta() > 0)
+    QPoint angleDelta = e->angleDelta();
+    int delta = angleDelta.x() != 0 ? angleDelta.x() : angleDelta.y();
+    if (delta > 0)
         onPrevious();
-    else if (e->delta() < 0)
+    else if (delta < 0)
         onNext();
     QWidget::wheelEvent(e);
 }
