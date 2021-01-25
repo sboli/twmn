@@ -127,6 +127,9 @@ private:
 
     inline std::size_t      getHeight();
 
+    QRect                   getScreenRect();
+    bool                    startMessageCommand(const Message& m, const char* key);
+
 private:
     Settings                m_settings;
     QUdpSocket              m_socket;
