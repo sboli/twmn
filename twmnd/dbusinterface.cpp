@@ -29,7 +29,7 @@ void DBusInterface::GetServerInformation(
     name = "twmnd";
     vendor = "twmnd";
     version = "1.0";
-    specVersion = "0";
+    specVersion = "1.2";
 }
 
 void DBusInterface::CloseNotification(unsigned int id)
