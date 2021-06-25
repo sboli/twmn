@@ -106,7 +106,7 @@ sound_command=  ;  Path to command. Leave empty for no sound.
 Installation
 ------------
 
-For [Arch Linux](http://www.archlinux.org/) users, `twmn` is [on the AUR](https://aur.archlinux.org/packages/twmn-git/).
+For [Arch Linux](http://www.archlinux.org/) users, `twmn-git` is [on the AUR](https://aur.archlinux.org/packages/twmn-git/).
 
 Otherwise you can install `twmnd` and `twmnc` manually:
 
