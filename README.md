@@ -1,11 +1,6 @@
 twmn
 ====
 
-# Project is looking for a new ownership
-If you're interested, reply on this issue : https://github.com/sboli/twmn/issues/101
-
----
-
 A notification system for tiling window managers. `twmn` is two things:
 
 `twmnc`: command line tool to send notifications to `twmnd`. You can also use `notify-send` for a similar purpose, but `twmnc` is more powerful. See `twmnc --help` for more information.
