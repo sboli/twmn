@@ -68,7 +68,7 @@ void send_tree(const boost::program_options::variables_map& vm, const boost::pro
     using namespace boost::asio;
     std::ostringstream oss;
     boost::property_tree::xml_parser::write_xml(oss, tree);
-    io_service ios;
+    io_context ios;
     ip::udp::socket s(ios, ip::udp::endpoint(ip::udp::v4(), 0));
     int port = vm.count("port") ? vm["port"].as<int>() : 0;
     if (!port)
@@ -77,7 +77,7 @@ void send_tree(const boost::program_options::variables_map& vm, const boost::pro
     boost::optional<std::string> host = tree.get_optional<std::string>("content.host");
     if (!host)
         host = boost::optional<std::string>(DEFAULT_HOST);
-    s.send_to(buffer(oss.str()), ip::udp::endpoint(ip::address(ip::address_v4::from_string(*host)), port));
+    s.send_to(buffer(oss.str()), ip::udp::endpoint(ip::address(ip::make_address_v4(*host)), port));
     ios.run();
 }
 
