@@ -10,7 +10,7 @@
 #include <QHBoxLayout>
 #include <QTimer>
 #include <QLabel>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QPixmap>
 #include <QPainter>
 #include <QTextDocument>
@@ -36,7 +36,6 @@ Widget::Widget(const char* wname) : m_settings(wname)//, m_shortcutGrabber(this,
     m_visible.setSingleShot(true);
     QHBoxLayout* l = new QHBoxLayout;
     l->setSizeConstraint(QLayout::SetNoConstraint);
-    l->setMargin(0);
     l->setContentsMargins(0, 0, 0, 0);
     setLayout(l);
     l->addWidget(m_contentView["icon"] = new QLabel);
@@ -196,9 +195,13 @@ void Widget::updateTopLeftAnimation(QVariant value)
     show();
 }
 
+static QRect screenGeometry() {
+    return QGuiApplication::screens().first()->availableGeometry();
+}
+
 void Widget::updateTopRightAnimation(QVariant value)
 {
-    const int end = QDesktopWidget().screenGeometry(this).width();
+    const int end = screenGeometry().width();
     const int val = value.toInt();
     const int finalHeight = getHeight();
     QPoint p(end, 0);
@@ -220,8 +223,8 @@ void Widget::updateTopRightAnimation(QVariant value)
 
 void Widget::updateBottomRightAnimation(QVariant value)
 {
-    const int wend = QDesktopWidget().screenGeometry(this).width();
-    const int hend = QDesktopWidget().screenGeometry(this).height();
+    const int wend = screenGeometry().width();
+    const int hend = screenGeometry().height();
     const int finalHeight = getHeight();
     const int val = value.toInt();
     QPoint p(wend, hend);
@@ -243,7 +246,7 @@ void Widget::updateBottomRightAnimation(QVariant value)
 
 void Widget::updateBottomLeftAnimation(QVariant value)
 {
-    const int hend = QDesktopWidget().screenGeometry(this).height();
+    const int hend = screenGeometry().height();
     const int finalHeight = getHeight();
     QPoint p(0, hend);
     if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
@@ -270,7 +273,7 @@ void Widget::updateTopCenterAnimation(QVariant value)
     const int finalWidth = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->endValue().toInt();
     const int finalHeight = getHeight();
     const int h = value.toInt() * finalHeight / finalWidth;
-    const int wend = QDesktopWidget().screenGeometry(this).width();
+    const int wend = screenGeometry().width();
 
     QPoint p1(wend, 0);
     QPoint p2(0, 0);
@@ -296,8 +299,8 @@ void Widget::updateBottomCenterAnimation(QVariant value)
     const int finalWidth = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->endValue().toInt();
     const int finalHeight = getHeight();
     const int h = value.toInt() * finalHeight / finalWidth;
-    const int wend = QDesktopWidget().screenGeometry(this).width();
-    const int hend = QDesktopWidget().screenGeometry(this).height();
+    const int wend = screenGeometry().width();
+    const int hend = screenGeometry().height();
     QPoint p1(wend, hend);
     QPoint p2(0, 0);
     if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
@@ -322,8 +325,8 @@ void Widget::updateCenterAnimation(QVariant value)
     const int finalWidth = qobject_cast<QPropertyAnimation*>(m_animation.animationAt(0))->endValue().toInt();
     const int finalHeight = getHeight();
     const int h = value.toInt() * finalHeight / finalWidth;
-    const int wend = QDesktopWidget().screenGeometry(this).width();
-    const int hend = QDesktopWidget().screenGeometry(this).height();
+    const int wend = screenGeometry().width();
+    const int hend = screenGeometry().height();
     QPoint p1(wend, hend);
     QPoint p2(0, 0);
     if (m_settings.has("gui/screen") && !m_settings.get("gui/screen").toString().isEmpty()) {
@@ -534,19 +537,19 @@ void Widget::setupFont()
 	else if (ss == "italic")
 		font.setStyle( QFont::StyleItalic );
 	else if (ss == "ultra-light")
-		font.setWeight( 13 );
+		font.setWeight( QFont::ExtraLight );
 	else if (ss == "light")
 		font.setWeight( QFont::Light );
 	else if (ss == "medium")
-		font.setWeight( 50 );
+		font.setWeight( QFont::Medium );
 	else if (ss == "semi-bold")
 		font.setWeight( QFont::DemiBold );
 	else if (ss == "bold")
 		font.setWeight( QFont::Bold );
 	else if (ss == "ultra-bold")
-		font.setWeight( QFont::Black );
+		font.setWeight( QFont::ExtraBold );
 	else if (ss == "heavy")
-		font.setWeight( 99 );
+		font.setWeight( QFont::Black );
 	else if (ss == "ultra-condensed")
 		font.setStretch( QFont::UltraCondensed );
 	else if (ss == "extra-condensed")
@@ -795,9 +798,9 @@ QPoint Widget::stringToPos(QString string)
     ret.setX(QString(splitted[0]).toInt());
     ret.setY(QString(splitted[1]).toInt());
     if (ret.x() < 0)
-      ret.setX(QDesktopWidget().screenGeometry(this).width() + ret.x());
+      ret.setX(screenGeometry().width() + ret.x());
     if (ret.y() < 0)
-      ret.setY(QDesktopWidget().screenGeometry(this).height() + ret.y());
+      ret.setY(screenGeometry().height() + ret.y());
 
     return ret;
 }

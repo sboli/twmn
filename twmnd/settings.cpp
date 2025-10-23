@@ -43,7 +43,6 @@ void Settings::reload()
     QSettings settings(QSettings::NativeFormat, QSettings::UserScope, "twmn", m_file);
     if (!settings.contains("main/port"))
         createDefaults();
-    settings.setIniCodec("UTF-8");
     QStringList keys = settings.allKeys();
     m_data.clear();
     foreach (QString i, keys) {
@@ -77,7 +76,6 @@ bool Settings::has(QString setting)
 void Settings::createDefaults()
 {
     QSettings settings(QSettings::NativeFormat, QSettings::UserScope, "twmn", m_file);
-    settings.setIniCodec("UTF-8");
     settings.clear();
     std::cout << "Creating default settings ... " << std::endl;
     for (QMap<QString, QVariant>::const_iterator it = m_data.begin(); it != m_data.end(); ++it) {

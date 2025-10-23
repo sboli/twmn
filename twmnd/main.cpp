@@ -1,5 +1,4 @@
 #include <QApplication>
-#include <QTextCodec>
 #include <QtGlobal>
 #include <QLocale>
 #include <QLibraryInfo>
@@ -50,7 +49,6 @@ int main(int argc, char *argv[])
     QPalette p = a.palette();
     p.setBrush(QPalette::Link, QBrush(QColor("black")));
     a.setPalette(p);
-    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
     const char* wname = "twmn";
     if (argc > 1) {
       wname = argv[1];
