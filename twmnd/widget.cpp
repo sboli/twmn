@@ -239,7 +239,7 @@ void Widget::updateBottomRightAnimation(QVariant value)
     }
     int offset_x = m_settings.get("gui/offset_x").toInt();
     int offset_y = m_settings.get("gui/offset_y").toInt();
-    setGeometry(p.x()-val+offset_x, p.y()-height()+offset_y, val, finalHeight);
+    setGeometry(p.x()-val+offset_x, p.y()-height()-offset_y, val, finalHeight);	// Fixed inverted offset_y.
     layout()->setSpacing(0);
     show();
 }
@@ -263,7 +263,9 @@ void Widget::updateBottomLeftAnimation(QVariant value)
         m_computedWidth = width;
     int offset_x = m_settings.get("gui/offset_x").toInt();
     int offset_y = m_settings.get("gui/offset_y").toInt();
-    setGeometry(value.toInt()-m_computedWidth, p.y()-height()+offset_x, m_computedWidth+offset_y, finalHeight);
+    //setGeometry(value.toInt()-m_computedWidth, p.y()-height()+offset_y, m_computedWidth+offset_x, finalHeight);	// Fixed inverted offsets.
+    setGeometry(value.toInt()-m_computedWidth, p.y()-height()-offset_y, m_computedWidth+offset_x, finalHeight);	// Fixed inverted offsets and offset_y.
+	/* Implementing offsets like that means the widget will be constantly exposed. Consider applying offsets to the calculated screen corner. p.rx()? */
     layout()->setSpacing(0);
     show();
 }
@@ -409,7 +411,7 @@ void Widget::doneBounce()
 
 void Widget::updateBounceAnimation(QVariant value)
 {
-    if(m_messageQueue.empty()){
+    if(m_messageQueue.empty()) {
         doneBounce();
         return;
     }
@@ -489,7 +491,7 @@ void Widget::reverseStart()
         anim->setDirection(QAnimationGroup::Backward);
         anim->setEasingCurve(QEasingCurve::Type(m_settings.get("gui/out_animation").toInt()));
         anim->setDuration(duration);
-        anim->setCurrentTime(duration);
+        //anim->setCurrentTime(duration);
 
         connect(anim, SIGNAL(valueChanged(QVariant)), this, m_activePositionSlot.c_str());
 
@@ -833,9 +835,9 @@ void Widget::updateFinalWidth()
 
 void Widget::onPrevious()
 {
-    m_visible.start();
     if (m_previousStack.size() < 1)
         return;
+    m_visible.start();	// Don't run this if returning.
     Message m = m_previousStack.pop();
     m_messageQueue.push_front(m);
     loadDefaults();
@@ -850,9 +852,9 @@ void Widget::onPrevious()
 
 void Widget::onNext()
 {
-    m_visible.start();
     if (m_messageQueue.size() < 2)
         return;
+    m_visible.start();	// Don't run this if returning.
     Message m = m_messageQueue.front();
     boost::optional<QVariant> tmpManual = m.data["manually_shown"];
     m.data["manually_shown"] = boost::optional<QVariant>(true);
@@ -872,6 +874,8 @@ void Widget::onNext()
 
 void Widget::onActivate()
 {
+	/* I did not implement sticking protection here because it might be desirable. */
+
     if (!m_messageQueue.isEmpty()) {
         if (startMessageCommand(m_messageQueue.front(), "ac")) {
             m_messageQueue.front().data["ac"] = "";
@@ -887,9 +891,12 @@ void Widget::onActivate()
 
 void Widget::onHide()
 {
+    m_animation.stop();
     m_messageQueue.clear();
-    m_visible.setInterval(2);
-    m_visible.start();
+    if (m_visible.isActive()) {
+        m_visible.setInterval(2);
+        //reverseStart();
+    }
 }
 
 void Widget::autoNext()
